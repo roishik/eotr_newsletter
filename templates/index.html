@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mobileye Newsletter Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"], textarea { width: 100%; padding: 5px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Mobileye Newsletter Generator</h1>
+    <form method="POST" action="/generate">
+        <div class="section">
+            <h2>Overall Settings</h2>
+            <label for="overall_prompt">Overall Prompt (Audience, Tone, Style):</label>
+            <textarea name="overall_prompt" id="overall_prompt" rows="3"></textarea>
+        </div>
+        
+        <div class="section">
+            <h2>Windshield View</h2>
+            <label for="windshield_url">Article URL:</label>
+            <input type="text" name="windshield_url" id="windshield_url">
+            <label for="windshield_notes">Notes (e.g., focus points, perspective):</label>
+            <textarea name="windshield_notes" id="windshield_notes" rows="3"></textarea>
+        </div>
+        
+        <div class="section">
+            <h2>Rearview Mirror (Multiple Stories)</h2>
+            {% for i in range(1,6) %}
+            <div style="border:1px dashed #aaa; padding:10px; margin-bottom:10px;">
+                <h3>Story {{ i }}</h3>
+                <label for="rearview_url_{{ i }}">Story URL:</label>
+                <input type="text" name="rearview_url_{{ i }}" id="rearview_url_{{ i }}">
+                <label for="rearview_notes_{{ i }}">Notes (optional):</label>
+                <textarea name="rearview_notes_{{ i }}" id="rearview_notes_{{ i }}" rows="2"></textarea>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="section">
+            <h2>Dashboard Data</h2>
+            <label for="dashboard_graph_url">Graph/Image URL:</label>
+            <input type="text" name="dashboard_graph_url" id="dashboard_graph_url">
+            <label for="dashboard_notes_new">What's New Notes:</label>
+            <textarea name="dashboard_notes_new" id="dashboard_notes_new" rows="2"></textarea>
+            <label for="dashboard_notes_matter">Why It Matters Notes:</label>
+            <textarea name="dashboard_notes_matter" id="dashboard_notes_matter" rows="2"></textarea>
+            <label for="dashboard_notes_think">What I Think Notes:</label>
+            <textarea name="dashboard_notes_think" id="dashboard_notes_think" rows="2"></textarea>
+        </div>
+        
+        <div class="section">
+            <h2>The Next Lane</h2>
+            <label for="nextlane_url">Article URL:</label>
+            <input type="text" name="nextlane_url" id="nextlane_url">
+            <label for="nextlane_notes">Notes (e.g., key points, perspective):</label>
+            <textarea name="nextlane_notes" id="nextlane_notes" rows="3"></textarea>
+        </div>
+        
+        <button type="submit">Generate Newsletter</button>
+    </form>
+</body>
+</html>

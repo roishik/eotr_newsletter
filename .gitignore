@@ -1,0 +1,13 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*.so
+
+# Environment variables file
+.env
+
+# Flask instance folder
+instance/
+
+# OS-specific files
+.DS_Store
