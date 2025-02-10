@@ -3,11 +3,11 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 from bs4 import BeautifulSoup
-from openai import OpenAI
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+import openai
 import os
 import datetime
+
+client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
@@ -35,17 +35,26 @@ def extract_article_text(url):
         return ""
 
 def generate_section_content(section_key, article_text, notes, overall_prompt):
-    """Generate content for one newsletter section using the ChatGPT API."""
-    # Build the prompt: overall prompt + default section prompt + article content + notes (if any)
-    prompt = f"{overall_prompt}\n\n{DEFAULT_PROMPTS[section_key]}\n\nArticle Content:\n{article_text}"
+    # Build the user prompt from your defaults and the article content
+    user_content = f"{DEFAULT_PROMPTS[section_key]}\n\nArticle Content:\n{article_text}"
     if notes:
-        prompt += f"\n\nNotes: {notes}"
+        user_content += f"\n\nNotes: {notes}"
+    
+    # Create the messages list for the chat endpoint
+    messages = [
+        {"role": "system", "content": overall_prompt},
+        {"role": "user", "content": user_content}
+    ]
 
-    response = client.completions.create(model="gpt-4",
-    prompt=prompt,
-    temperature=0.7,
-    max_tokens=300)
+    # Use the new client.chat.completions.create endpoint:
+    response = client.chat.completions.create(
+        model="gpt-4o",  # adjust the model name if needed
+        messages=messages,
+        temperature=0.7,
+        max_tokens=300
+    )
 
+    # In v1.0.0 the message is usually available as an attribute
     return response.choices[0].message.content.strip()
 
 @app.route("/", methods=["GET"])
