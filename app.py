@@ -40,14 +40,13 @@ def generate_section_content(section_key, article_text, notes, overall_prompt):
     if notes:
         prompt += f"\n\nNotes: {notes}"
     
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=300  # Adjust if you need longer responses
+    response = openai.Completion.create(
+    model="gpt-4",
+    prompt=prompt,
+    temperature=0.7,
+    max_tokens=300
     )
+
     return response.choices[0].message['content'].strip()
 
 @app.route("/", methods=["GET"])
