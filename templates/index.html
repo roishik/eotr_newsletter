@@ -1,77 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mobileye Newsletter Generator</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .section { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input[type="text"], textarea { width: 100%; padding: 5px; margin-top: 5px; }
+        textarea, input { width: 100%; padding: 8px; margin-top: 5px; }
     </style>
+    <script>
+        function generateSection(sectionKey) {
+            const urls = document.getElementById(`${sectionKey}_urls`).value;
+            const notes = document.getElementById(`${sectionKey}_notes`).value;
+            const prompt = document.getElementById(`${sectionKey}_prompt`).value;
+
+            fetch("/generate_section", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ section_key: sectionKey, article_urls: urls, notes: notes, section_prompt: prompt })
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById(`${sectionKey}_output`).innerHTML = data.output)
+            .catch(error => console.error("Error:", error));
+        }
+
+        function createNewsletter() {
+            fetch("/create_newsletter", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("final_output").innerHTML = data.content;
+                alert(`Newsletter saved as ${data.filename}`);
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
 </head>
 <body>
     <h1>Mobileye Newsletter Generator</h1>
-    <form method="POST" action="/generate">
-        <div class="section">
-            <h2>Overall Settings</h2>
-            <label for="overall_prompt">Overall Prompt (Audience, Tone, Style):</label>
-            <textarea name="overall_prompt" id="overall_prompt" rows="3">{{ defaultPrompts["overall"] }}</textarea>
+
+    <div class="section">
+        <h2>Overall Prompt</h2>
+        <textarea id="overall_prompt" placeholder="Overall Prompt">{{ defaultPrompts["overall"] }}</textarea>
+    </div>
+
+    <div class="section">
+        <h2>Windshield View</h2>
+        <input type="text" id="windshield_urls" placeholder="Comma-separated URLs (e.g., URL1, URL2)">
+        <textarea id="windshield_notes" placeholder="Notes"></textarea>
+        <textarea id="windshield_prompt" placeholder="Section Prompt">{{ defaultPrompts["windshield"] }}</textarea>
+        <button onclick="generateSection('windshield')">Generate Section</button>
+        <div id="windshield_output"></div>
+    </div>
+
+    <div class="section">
+        <h2>Rearview Mirror (Multiple Stories)</h2>
+        {% for i in range(1,6) %}
+        <div>
+            <input type="text" id="rearview_urls_{{ i }}" placeholder="Story {{ i }} URLs">
+            <textarea id="rearview_notes_{{ i }}" placeholder="Notes"></textarea>
+            <textarea id="rearview_prompt_{{ i }}" placeholder="Section Prompt">{{ defaultPrompts["rearview"] }}</textarea>
+            <button onclick="generateSection('rearview')">Generate Story {{ i }}</button>
+            <div id="rearview_output_{{ i }}"></div>
         </div>
+        {% endfor %}
+    </div>
 
-        <div class="section">
-            <h2>Windshield View</h2>
-            <label for="windshield_url">Article URL:</label>
-            <input type="text" name="windshield_url" id="windshield_url">
+    <div class="section">
+        <h2>Dashboard Data</h2>
+        <input type="text" id="dashboard_urls" placeholder="Comma-separated URLs (e.g., URL1, URL2)">
+        <textarea id="dashboard_notes" placeholder="Notes"></textarea>
+        <textarea id="dashboard_prompt" placeholder="Section Prompt">{{ defaultPrompts["dashboard"] }}</textarea>
+        <button onclick="generateSection('dashboard')">Generate Section</button>
+        <div id="dashboard_output"></div>
+    </div>
 
-            <label for="windshield_prompt">Section Prompt:</label>
-            <textarea name="windshield_prompt" id="windshield_prompt" rows="3">{{ defaultPrompts["windshield"] }}</textarea>
+    <div class="section">
+        <h2>The Next Lane</h2>
+        <input type="text" id="nextlane_urls" placeholder="Comma-separated URLs (e.g., URL1, URL2)">
+        <textarea id="nextlane_notes" placeholder="Notes"></textarea>
+        <textarea id="nextlane_prompt" placeholder="Section Prompt">{{ defaultPrompts["nextlane"] }}</textarea>
+        <button onclick="generateSection('nextlane')">Generate Section</button>
+        <div id="nextlane_output"></div>
+    </div>
 
-            <label for="windshield_notes">Notes (Points to extract from the article):</label>
-            <textarea name="windshield_notes" id="windshield_notes" rows="3"></textarea>
-        </div>
-
-        <div class="section">
-            <h2>Rearview Mirror (Multiple Stories)</h2>
-            {% for i in range(1,6) %}
-            <div style="border:1px dashed #aaa; padding:10px; margin-bottom:10px;">
-                <h3>Story {{ i }}</h3>
-                <label for="rearview_url_{{ i }}">Story URL:</label>
-                <input type="text" name="rearview_url_{{ i }}" id="rearview_url_{{ i }}">
-
-                <label for="rearview_prompt_{{ i }}">Section Prompt:</label>
-                <textarea name="rearview_prompt_{{ i }}" id="rearview_prompt_{{ i }}" rows="2">{{ defaultPrompts["rearview"] }}</textarea>
-
-                <label for="rearview_notes_{{ i }}">Notes (Points to extract from the article):</label>
-                <textarea name="rearview_notes_{{ i }}" id="rearview_notes_{{ i }}" rows="2"></textarea>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="section">
-            <h2>Dashboard Data</h2>
-            <label for="dashboard_graph_url">Graph/Image URL:</label>
-            <input type="text" name="dashboard_graph_url" id="dashboard_graph_url">
-
-            <label for="dashboard_prompt">Section Prompt:</label>
-            <textarea name="dashboard_prompt" id="dashboard_prompt" rows="3">{{ defaultPrompts["dashboard"] }}</textarea>
-
-            <label for="dashboard_notes">Notes (Points to extract):</label>
-            <textarea name="dashboard_notes" id="dashboard_notes" rows="3"></textarea>
-        </div>
-
-        <div class="section">
-            <h2>The Next Lane</h2>
-            <label for="nextlane_url">Article URL:</label>
-            <input type="text" name="nextlane_url" id="nextlane_url">
-
-            <label for="nextlane_prompt">Section Prompt:</label>
-            <textarea name="nextlane_prompt" id="nextlane_prompt" rows="3">{{ defaultPrompts["nextlane"] }}</textarea>
-
-            <label for="nextlane_notes">Notes (Points to extract from the article):</label>
-            <textarea name="nextlane_notes" id="nextlane_notes" rows="3"></textarea>
-        </div>
-
-        <button type="submit">Generate Newsletter</button>
-    </form>
+    <h2>Finalize Newsletter</h2>
+    <button onclick="createNewsletter()">Create Newsletter</button>
+    <div id="final_output"></div>
 </body>
 </html>

@@ -1,4 +1,4 @@
-#!exi /Users/roishi/miniconda3/envs/eotr_newsletter
+#!/Users/roishi/miniconda3/envs/ eotr_newsletter
 
 from flask import Flask, render_template, request, jsonify
 import requests
@@ -6,134 +6,120 @@ from bs4 import BeautifulSoup
 import openai
 import os
 import datetime
-
-client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
+import json
 
 app = Flask(__name__)
 
-# Set your OpenAI API key in an environment variable (e.g., OPENAI_API_KEY)
+# Folder setup
+SECTIONS_DIR = "sections"
+FINAL_NEWSLETTERS_DIR = "newsletters"
+os.makedirs(SECTIONS_DIR, exist_ok=True)
+os.makedirs(FINAL_NEWSLETTERS_DIR, exist_ok=True)
 
-# Section-specific prompts
+# OpenAI setup
+client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
+
 DEFAULT_PROMPTS = {
-    "overall": "You are writing an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. The tone is professional and insightful, and the audience is Mobileye employees. Maintain consistency with previous issues.",
-    "windshield": "Summarize the article in 2-3 paragraphs, focusing on its key message and its relevance to Mobileye’s work. The tone should be engaging and thought-provoking.",
-    "rearview": "Provide a brief headline with a hyperlink followed by 1-3 sentences summarizing the key takeaway from the story.",
-    "dashboard": "Write 3 parts:\n- What's new: Describe key trends or insights from the graph or data.\n- Why it matters: Explain the impact of this data on the automotive or AI landscape.\n- What I think: Share your perspective on how Mobileye can act on or respond to this information.",
-    "nextlane": "Summarize the competitor’s or academic’s new development in 2-3 paragraphs. Highlight its implications for Mobileye’s current or future strategies and innovation efforts."
+    "overall": "You are writing an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary—just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging.",
+    "windshield": "Summarize the articles in 2-3 paragraphs, focusing on their relevance to Mobileye’s work.",
+    "rearview": "Provide a brief headline with a hyperlink followed by 1-3 sentences summarizing the key takeaway.",
+    "dashboard": "Write 3 parts:\n- What's new: Describe key trends or insights.\n- Why it matters: Explain the impact on Mobileye.\n- What I think: Share personal opinion.",
+    "nextlane": "Summarize competitor/academic news in 2-3 paragraphs, highlighting its implications for Mobileye."
 }
 
-def extract_article_text(url):
-    """Fetch and extract article text from a given URL using BeautifulSoup."""
-    try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-        paragraphs = soup.find_all('p')
-        text = "\n".join(p.get_text() for p in paragraphs)
-        return text
-    except Exception as e:
-        print(f"Error fetching URL {url}: {e}")
-        return ""
-
-def generate_section_content(section_key, article_text, notes, overall_prompt):
-    # Build the user prompt from your defaults and the article content
-    user_content = f"{DEFAULT_PROMPTS[section_key]}\n\nArticle Content:\n{article_text}"
-    if notes:
-        user_content += f"\n\nNotes: {notes}"
+FINAL_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobileye Newsletter</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #2e6c80; }
+        .section { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Mobileye Newsletter</h1>
+    <p>Welcome to this week’s issue of Mobileye’s internal newsletter. Below are the latest insights, news, and developments.</p>
     
-    # Create the messages list for the chat endpoint
-    messages = [
-        {"role": "system", "content": overall_prompt},
-        {"role": "user", "content": user_content}
-    ]
+    {content}
+</body>
+</html>
+"""
 
-    # Use the new client.chat.completions.create endpoint:
+def extract_article_text(urls):
+    """Fetch and combine article text from multiple URLs."""
+    combined_text = ""
+    # Split the URLs properly and trim any whitespace
+    url_list = [url.strip() for url in urls.split(";;") if url.strip()]
+    
+    for url in url_list:
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise an error for bad responses (e.g., 404)
+            soup = BeautifulSoup(response.text, "html.parser")
+            paragraphs = soup.find_all('p')
+            combined_text += "\n".join(p.get_text() for p in paragraphs) + "\n\n"
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching URL {url}: {e}")
+    
+    return combined_text.strip()
+
+
+def generate_section_content(section_key, article_text, notes):
+    """Generate content using OpenAI."""
+    user_content = f"{DEFAULT_PROMPTS[section_key]}\n\nCombined Article Content:\n{article_text}\n\nNotes: {notes if notes else ''}"
+    messages = [{"role": "system", "content": DEFAULT_PROMPTS["overall"]}, {"role": "user", "content": user_content}]
+
     response = client.chat.completions.create(
-        model="gpt-4o",  # adjust the model name if needed
-        messages=messages,
-        temperature=0.7,
-        max_tokens=300
+        model="gpt-4", messages=messages, temperature=0.7, max_tokens=500
     )
-
-    # In v1.0.0 the message is usually available as an attribute
     return response.choices[0].message.content.strip()
 
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html", defaultPrompts=DEFAULT_PROMPTS)
 
-@app.route("/generate", methods=["POST"])
-def generate_newsletter():
-    overall_prompt = request.form.get("overall_prompt", DEFAULT_PROMPTS["overall"])
+@app.route("/generate_section", methods=["POST"])
+def generate_section():
+    section_key = request.form.get("section_key")
+    article_urls = request.form.get("article_urls")
+    notes = request.form.get("notes")
 
-    # Process Windshield View
-    windshield_url = request.form.get("windshield_url")
-    windshield_notes = request.form.get("windshield_notes")
-    windshield_text = extract_article_text(windshield_url) if windshield_url else ""
-    windshield_output = ""
-    if windshield_url:
-        windshield_output = generate_section_content("windshield", windshield_text, windshield_notes, overall_prompt)
+    article_text = extract_article_text(article_urls)
+    output = generate_section_content(section_key, article_text, notes)
 
-    # Process Rearview Mirror: Allow up to 5 stories
-    rearview_outputs = []
-    for i in range(1, 6):
-        story_url = request.form.get(f"rearview_url_{i}")
-        story_notes = request.form.get(f"rearview_notes_{i}")
-        if story_url:
-            story_text = extract_article_text(story_url)
-            output = generate_section_content("rearview", story_text, story_notes, overall_prompt)
-            # Format as a headline with a hyperlink followed by the generated summary.
-            headline = f'<a href="{story_url}" target="_blank">{story_url}</a>'
-            rearview_outputs.append(f"{headline}<br>{output}")
-    rearview_output = "\n\n".join(rearview_outputs)
+    section_data = {"article_urls": article_urls, "notes": notes, "output": output}
+    with open(f"{SECTIONS_DIR}/{section_key}.json", "w") as f:
+        json.dump(section_data, f)
 
-    # Process Dashboard Data
-    dashboard_graph_url = request.form.get("dashboard_graph_url")
-    dashboard_notes_new = request.form.get("dashboard_notes_new")
-    dashboard_notes_matter = request.form.get("dashboard_notes_matter")
-    dashboard_notes_think = request.form.get("dashboard_notes_think")
-    # Combine the notes for the three parts
-    dashboard_combined_notes = (
-        f"Notes for What's new: {dashboard_notes_new}\n"
-        f"Notes for Why it matters: {dashboard_notes_matter}\n"
-        f"Notes for What I think: {dashboard_notes_think}"
-    )
-    # Include the graph URL in the article text for context
-    dashboard_text = f"Graph/Image URL: {dashboard_graph_url}" if dashboard_graph_url else ""
-    dashboard_output = ""
-    if dashboard_graph_url or dashboard_combined_notes:
-        dashboard_output = generate_section_content("dashboard", dashboard_text, dashboard_combined_notes, overall_prompt)
+    return jsonify({"output": output})
 
-    # Process The Next Lane
-    nextlane_url = request.form.get("nextlane_url")
-    nextlane_notes = request.form.get("nextlane_notes")
-    nextlane_text = extract_article_text(nextlane_url) if nextlane_url else ""
-    nextlane_output = ""
-    if nextlane_url:
-        nextlane_output = generate_section_content("nextlane", nextlane_text, nextlane_notes, overall_prompt)
+@app.route("/create_newsletter", methods=["POST"])
+def create_newsletter():
+    sections = ["windshield", "rearview", "dashboard", "nextlane"]
+    formatted_content = ""
 
-    # Assemble final newsletter text (each section separated by dividers)
-    newsletter = (
-        f"---\nWIND SHIELD VIEW\n\n{windshield_output}\n\n"
-        f"---\nREARVIEW MIRROR\n\n{rearview_output}\n\n"
-        f"---\nDASHBOARD DATA\n\n{dashboard_output}\n\n"
-        f"---\nTHE NEXT LANE\n\n{nextlane_output}\n---"
-    )
+    for section in sections:
+        with open(f"{SECTIONS_DIR}/{section}.json") as f:
+            data = json.load(f)
+            formatted_content += f"""
+            <div class="section">
+                <h2>{section.capitalize()} Section</h2>
+                <p>{data['output']}</p>
+            </div>
+            """
 
-    return render_template("result.html", newsletter=newsletter)
+    final_output = FINAL_TEMPLATE.format(content=formatted_content)
+    filename = f"newsletter_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    filepath = os.path.join(FINAL_NEWSLETTERS_DIR, filename)
+    
+    with open(filepath, "w") as f:
+        f.write(final_output)
 
-@app.route("/save_draft", methods=["POST"])
-def save_draft():
-    """Save the final newsletter text to a local file in a 'drafts' folder."""
-    newsletter_text = request.form.get("newsletter_text")
-    if newsletter_text:
-        drafts_dir = "drafts"
-        os.makedirs(drafts_dir, exist_ok=True)
-        filename = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_newsletter.txt")
-        filepath = os.path.join(drafts_dir, filename)
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(newsletter_text)
-        return jsonify({"status": "success", "message": f"Draft saved as {filename}"})
-    return jsonify({"status": "error", "message": "No newsletter text provided"}), 400
+    return jsonify({"message": "Newsletter created", "filename": filename, "content": final_output})
 
 if __name__ == "__main__":
     app.run(debug=True)
