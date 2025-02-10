@@ -3,14 +3,15 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 from bs4 import BeautifulSoup
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 import os
 import datetime
 
 app = Flask(__name__)
 
 # Set your OpenAI API key in an environment variable (e.g., OPENAI_API_KEY)
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Section-specific prompts
 DEFAULT_PROMPTS = {
@@ -39,15 +40,13 @@ def generate_section_content(section_key, article_text, notes, overall_prompt):
     prompt = f"{overall_prompt}\n\n{DEFAULT_PROMPTS[section_key]}\n\nArticle Content:\n{article_text}"
     if notes:
         prompt += f"\n\nNotes: {notes}"
-    
-    response = openai.Completion.create(
-    model="gpt-4",
+
+    response = client.completions.create(model="gpt-4",
     prompt=prompt,
     temperature=0.7,
-    max_tokens=300
-    )
+    max_tokens=300)
 
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content.strip()
 
 @app.route("/", methods=["GET"])
 def index():
