@@ -1,3 +1,5 @@
+#!exi /Users/roishi/miniconda3/envs/eotr_newsletter
+
 from flask import Flask, render_template, request, jsonify
 import requests
 from bs4 import BeautifulSoup
@@ -10,16 +12,13 @@ app = Flask(__name__)
 # Set your OpenAI API key in an environment variable (e.g., OPENAI_API_KEY)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Default prompt templates (derived from your previous PDF style/template)
+# Section-specific prompts
 DEFAULT_PROMPTS = {
-    "overall": "You are writing an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. Tone: professional, insightful. Audience: internal Mobileye team.",
-    "windshield": "Summarize the linked article focusing on its key message. Write 2-3 engaging paragraphs in a style similar to previous newsletters.",
-    "rearview": "Extract the headline and provide a brief 1-3 sentence summary of the story in an informative, concise manner.",
-    "dashboard": ("Based on the provided graph/data, write three parts:\n"
-                  "What's new: Provide a brief description of the latest trend.\n"
-                  "Why it matters: Explain the impact on the industry.\n"
-                  "What I think: Offer a personal insight related to Mobileye's vision."),
-    "nextlane": "Summarize the linked article focusing on its relevance to Mobileye's initiatives. Write in a style consistent with our internal newsletter."
+    "overall": "You are writing an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. The tone is professional and insightful, and the audience is Mobileye employees. Maintain consistency with previous issues.",
+    "windshield": "Summarize the article in 2-3 paragraphs, focusing on its key message and its relevance to Mobileye’s work. The tone should be engaging and thought-provoking.",
+    "rearview": "Provide a brief headline with a hyperlink followed by 1-3 sentences summarizing the key takeaway from the story.",
+    "dashboard": "Write 3 parts:\n- What's new: Describe key trends or insights from the graph or data.\n- Why it matters: Explain the impact of this data on the automotive or AI landscape.\n- What I think: Share your perspective on how Mobileye can act on or respond to this information.",
+    "nextlane": "Summarize the competitor’s or academic’s new development in 2-3 paragraphs. Highlight its implications for Mobileye’s current or future strategies and innovation efforts."
 }
 
 def extract_article_text(url):
@@ -53,7 +52,7 @@ def generate_section_content(section_key, article_text, notes, overall_prompt):
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
+    return render_template("index.html", defaultPrompts=DEFAULT_PROMPTS)
 
 @app.route("/generate", methods=["POST"])
 def generate_newsletter():
