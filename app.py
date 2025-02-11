@@ -74,7 +74,7 @@ def generate_section_content(section_key, article_text, notes):
     messages = [{"role": "system", "content": DEFAULT_PROMPTS["overall"]}, {"role": "user", "content": user_content}]
 
     response = client.chat.completions.create(
-        model="gpt-4", messages=messages, temperature=0.7, max_tokens=500
+        model="gpt-4o", messages=messages, temperature=0.7, max_tokens=500
     )
     return response.choices[0].message.content.strip()
 
