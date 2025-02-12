@@ -100,23 +100,28 @@ def generate_section():
 
 @app.route("/create_newsletter", methods=["POST"])
 def create_newsletter():
-    sections = ["windshield", "rearview", "dashboard", "nextlane"]
+    sections = ["windshield", "dashboard", "nextlane"]  # Main sections
+    rearview_sections = [f"rearview_{i}" for i in range(1, 6)]  # Handle multiple rearview stories
+
     formatted_content = ""
 
-    for section in sections:
-        with open(f"{SECTIONS_DIR}/{section}.json") as f:
-            data = json.load(f)
-            formatted_content += f"""
-            <div class="section">
-                <h2>{section.capitalize()} Section</h2>
-                <p>{data['output']}</p>
-            </div>
-            """
+    for section in sections + rearview_sections:  # Combine all sections
+        try:
+            with open(f"{SECTIONS_DIR}/{section}.json") as f:
+                data = json.load(f)
+                formatted_content += f"""
+                <div class="section">
+                    <h2>{section.replace("_", " ").capitalize()} Section</h2>
+                    <p>{data['output']}</p>
+                </div>
+                """
+        except FileNotFoundError:
+            continue  # Skip missing sections
 
     final_output = FINAL_TEMPLATE.format(content=formatted_content)
     filename = f"newsletter_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
     filepath = os.path.join(FINAL_NEWSLETTERS_DIR, filename)
-    
+
     with open(filepath, "w") as f:
         f.write(final_output)
 

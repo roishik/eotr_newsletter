@@ -21,7 +21,9 @@
                 body: new URLSearchParams({ section_key: sectionKey, article_urls: urls, notes: notes, section_prompt: prompt })
             })
             .then(response => response.json())
-            .then(data => document.getElementById(`${sectionKey}_output`).innerHTML = data.output)
+            .then(data => {
+                document.getElementById(`${sectionKey}_output`).innerHTML = data.output;
+            })
             .catch(error => console.error("Error:", error));
         }
     </script>
