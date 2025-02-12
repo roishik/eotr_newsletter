@@ -24,7 +24,8 @@
             .then(data => document.getElementById(`${sectionKey}_output`).innerHTML = data.output)
             .catch(error => console.error("Error:", error));
         }
-
+    </script>
+    <script>
         function createNewsletter() {
             fetch("/create_newsletter", { method: "POST" })
             .then(response => response.json())
@@ -60,7 +61,7 @@
             <input type="text" id="rearview_urls_{{ i }}" placeholder="Story {{ i }} URLs">
             <textarea id="rearview_notes_{{ i }}" placeholder="Notes"></textarea>
             <textarea id="rearview_prompt_{{ i }}" placeholder="Section Prompt">{{ defaultPrompts["rearview"] }}</textarea>
-            <button onclick="generateSection('rearview')">Generate Story {{ i }}</button>
+            <button onclick="generateSection('rearview_{{ i }}')">Generate Story {{ i }}</button>
             <div id="rearview_output_{{ i }}"></div>
         </div>
         {% endfor %}
@@ -68,7 +69,7 @@
 
     <div class="section">
         <h2>Dashboard Data</h2>
-        <input type="text" id="dashboard_urls" placeholder="Comma-separated URLs (e.g., URL1, URL2)">
+        <input type="text" id="dashboard_urls" placeholder=";;-separated URLs (e.g., URL1, URL2)">
         <textarea id="dashboard_notes" placeholder="Notes"></textarea>
         <textarea id="dashboard_prompt" placeholder="Section Prompt">{{ defaultPrompts["dashboard"] }}</textarea>
         <button onclick="generateSection('dashboard')">Generate Section</button>
@@ -77,7 +78,7 @@
 
     <div class="section">
         <h2>The Next Lane</h2>
-        <input type="text" id="nextlane_urls" placeholder="Comma-separated URLs (e.g., URL1, URL2)">
+        <input type="text" id="nextlane_urls" placeholder=";;-separated URLs (e.g., URL1, URL2)">
         <textarea id="nextlane_notes" placeholder="Notes"></textarea>
         <textarea id="nextlane_prompt" placeholder="Section Prompt">{{ defaultPrompts["nextlane"] }}</textarea>
         <button onclick="generateSection('nextlane')">Generate Section</button>

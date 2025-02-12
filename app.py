@@ -20,7 +20,7 @@ os.makedirs(FINAL_NEWSLETTERS_DIR, exist_ok=True)
 client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
 
 DEFAULT_PROMPTS = {
-    "overall": "You are writing an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary—just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging.",
+    "overall": "You are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary—just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging.",
     "windshield": "Summarize the articles in 2-3 paragraphs, focusing on their relevance to Mobileye’s work.",
     "rearview": "Provide a brief headline with a hyperlink followed by 1-3 sentences summarizing the key takeaway.",
     "dashboard": "Write 3 parts:\n- What's new: Describe key trends or insights.\n- Why it matters: Explain the impact on Mobileye.\n- What I think: Share personal opinion.",
@@ -68,9 +68,9 @@ def extract_article_text(urls):
     return combined_text.strip()
 
 
-def generate_section_content(section_key, article_text, notes):
+def generate_section_content(section_key, article_text, notes, section_prompt):
     """Generate content using OpenAI."""
-    user_content = f"{DEFAULT_PROMPTS[section_key]}\n\nCombined Article Content:\n{article_text}\n\nNotes: {notes if notes else ''}"
+    user_content = f"{section_prompt}\n\nCombined Article Content:\n{article_text}\n\nNotes: {notes if notes else ''}"
     messages = [{"role": "system", "content": DEFAULT_PROMPTS["overall"]}, {"role": "user", "content": user_content}]
 
     response = client.chat.completions.create(
@@ -87,9 +87,10 @@ def generate_section():
     section_key = request.form.get("section_key")
     article_urls = request.form.get("article_urls")
     notes = request.form.get("notes")
+    section_prompt = request.form.get("section_prompt")
 
     article_text = extract_article_text(article_urls)
-    output = generate_section_content(section_key, article_text, notes)
+    output = generate_section_content(section_key, article_text, notes, section_prompt)
 
     section_data = {"article_urls": article_urls, "notes": notes, "output": output}
     with open(f"{SECTIONS_DIR}/{section_key}.json", "w") as f:
