@@ -1,14 +1,13 @@
-#! /Users/roishi/miniconda3/envs/eotr_newsletter/bin/python
-
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import openai
 import datetime
 import os
+import streamlit.components.v1 as components
 
 # Set up your OpenAI API key (make sure the OPENAI_API_KEY environment variable is set)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Default prompts for each section
 DEFAULT_PROMPTS = {
@@ -47,6 +46,7 @@ def extract_article_text(urls):
             st.error(f"Error fetching URL {url}: {e}")
     return combined_text.strip()
 
+# Updated generate_section_content function using the correct openai API call
 def generate_section_content(section_key, article_text, notes, section_prompt):
     """Generates content using OpenAI's API."""
     user_content = (
@@ -57,7 +57,7 @@ def generate_section_content(section_key, article_text, notes, section_prompt):
         {"role": "user", "content": user_content}
     ]
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4o",
             messages=messages,
             temperature=0.7,
@@ -197,7 +197,8 @@ def main():
                 """
             newsletter_html = generate_newsletter_html(sections_content)
             st.success("Newsletter Created!")
-            st.markdown(newsletter_html, unsafe_allow_html=True)
+            # Render the newsletter using an iframe-like component
+            components.html(newsletter_html, height=600, scrolling=True)
             st.download_button(
                 "Download Newsletter",
                 data=newsletter_html,
