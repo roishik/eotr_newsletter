@@ -160,8 +160,15 @@ def generate_newsletter_html(sections_content):
 
 # ----------------------------------------------------------------
 def main():
+    if "generated_sections" not in st.session_state:
+        st.session_state.generated_sections = {}
+        
     st.title("Mobileye Newsletter Generator")
     st.markdown("Generate your weekly Mobileye newsletter using a clean, modern interface.")
+
+    # Initialize the generated_sections in session state if it doesn't exist
+    if "generated_sections" not in st.session_state:
+        st.session_state.generated_sections = {}
 
     # Save/Load Draft Functionality in the Sidebar
     st.sidebar.header("Drafts")
@@ -212,7 +219,7 @@ def main():
             generated_text = generate_section_content("windshield", article_text, windshield_notes, windshield_prompt)
             st.success("Windshield section generated!")
             st.write(generated_text)
-            generated_sections["Windshield View"] = generated_text
+            st.session_state.generated_sections["Windshield View"] = generated_text
 
     # Rearview Mirror Section (multiple stories)
     st.subheader("Rearview Mirror (Multiple Stories)")
@@ -244,13 +251,19 @@ def main():
             key=f"rearview_prompt_{i}",
             height=80
         )
-        if st.button(f"Generate Story {i}", key=f"generate_rearview_{i}"):
-            with st.spinner(f"Generating Rearview Story {i}..."):
-                article_text = extract_article_text(story_urls)
-                generated_text = generate_section_content(f"rearview_{i}", article_text, story_notes, story_prompt)
-                st.success(f"Story {i} generated!")
+        if st.button(f"Generate Rearview {i} Section"):
+            with st.spinner(f"Generating Rearview {i} section..."):
+                article_text = extract_article_text(st.session_state[f"rearview_urls_{i}"])
+                generated_text = generate_section_content(
+                    "rearview",
+                    article_text,
+                    st.session_state[f"rearview_notes_{i}"],
+                    st.session_state[f"rearview_prompt_{i}"]
+                )
+                st.success(f"Rearview {i} section generated!")
                 st.write(generated_text)
-                rearview_generated[f"Rearview Story {i}"] = generated_text
+                # Add this line to store the section in session state
+                st.session_state.generated_sections[f"Rearview Mirror {i}"] = generated_text
     generated_sections.update(rearview_generated)
 
     # Dashboard Data Section
@@ -278,7 +291,7 @@ def main():
             generated_text = generate_section_content("dashboard", article_text, dashboard_notes, dashboard_prompt)
             st.success("Dashboard section generated!")
             st.write(generated_text)
-            generated_sections["Dashboard Data"] = generated_text
+            st.session_state.generated_sections["Dashboard Data"] = generated_text
 
     # The Next Lane Section
     st.subheader("The Next Lane")
@@ -305,14 +318,14 @@ def main():
             generated_text = generate_section_content("nextlane", article_text, nextlane_notes, nextlane_prompt)
             st.success("The Next Lane section generated!")
             st.write(generated_text)
-            generated_sections["The Next Lane"] = generated_text
+            st.session_state.generated_sections["The Next Lane"] = generated_text
 
     # Assemble Newsletter
     st.markdown("---")
     if st.button("Create Newsletter"):
         with st.spinner("Assembling Newsletter..."):
             sections_content = ""
-            for title, content in generated_sections.items():
+            for title, content in st.session_state.generated_sections.items():
                 sections_content += f"""
                 <div class="section">
                     <h2>{title}</h2>
