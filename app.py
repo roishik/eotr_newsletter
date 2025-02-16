@@ -4,10 +4,14 @@ from bs4 import BeautifulSoup
 import openai
 import datetime
 import os
+import json
 import streamlit.components.v1 as components
 
 # Set up your OpenAI API key (make sure the OPENAI_API_KEY environment variable is set)
 client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Create necessary directories
+os.makedirs("drafts", exist_ok=True)
 
 # Default prompts for each section
 DEFAULT_PROMPTS = {
@@ -30,6 +34,46 @@ DEFAULT_PROMPTS = {
     "nextlane": "Summarize competitor/academic news in 2-3 paragraphs, highlighting its implications for Mobileye."
 }
 
+# ----------------------------------------------------------------
+# Functions for saving and loading draft data
+
+def save_draft():
+    """Saves the current state of all input fields to a JSON file in the drafts folder."""
+    draft_data = {
+        "overall_prompt": st.session_state.get("overall_prompt", DEFAULT_PROMPTS["overall"]),
+        "windshield_urls": st.session_state.get("windshield_urls", ""),
+        "windshield_notes": st.session_state.get("windshield_notes", ""),
+        "windshield_prompt": st.session_state.get("windshield_prompt", DEFAULT_PROMPTS["windshield"]),
+        "num_rearview": st.session_state.get("num_rearview", 3),
+        "dashboard_urls": st.session_state.get("dashboard_urls", ""),
+        "dashboard_notes": st.session_state.get("dashboard_notes", ""),
+        "dashboard_prompt": st.session_state.get("dashboard_prompt", DEFAULT_PROMPTS["dashboard"]),
+        "nextlane_urls": st.session_state.get("nextlane_urls", ""),
+        "nextlane_notes": st.session_state.get("nextlane_notes", ""),
+        "nextlane_prompt": st.session_state.get("nextlane_prompt", DEFAULT_PROMPTS["nextlane"])
+    }
+    for i in range(1, 6):
+        draft_data[f"rearview_urls_{i}"] = st.session_state.get(f"rearview_urls_{i}", "")
+        draft_data[f"rearview_notes_{i}"] = st.session_state.get(f"rearview_notes_{i}", "")
+        draft_data[f"rearview_prompt_{i}"] = st.session_state.get(f"rearview_prompt_{i}", DEFAULT_PROMPTS["rearview"])
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"drafts/draft_{timestamp}.json"
+    with open(filename, "w") as f:
+        json.dump(draft_data, f, indent=4)
+    st.sidebar.success(f"Draft saved as {filename}")
+
+def load_draft(filename):
+    """Loads the selected draft and updates session state accordingly."""
+    with open(f"drafts/{filename}", "r") as f:
+        draft_data = json.load(f)
+    for key, value in draft_data.items():
+        st.session_state[key] = value
+    st.sidebar.success("Draft loaded!")
+    st.rerun()
+
+# ----------------------------------------------------------------
+# Functions for newsletter generation
+
 def extract_article_text(urls):
     """Fetches and combines article content from multiple URLs."""
     combined_text = ""
@@ -46,7 +90,6 @@ def extract_article_text(urls):
             st.error(f"Error fetching URL {url}: {e}")
     return combined_text.strip()
 
-# Updated generate_section_content function using the correct openai API call
 def generate_section_content(section_key, article_text, notes, section_prompt):
     """Generates content using OpenAI's API."""
     user_content = (
@@ -115,22 +158,54 @@ def generate_newsletter_html(sections_content):
     """
     return html_template
 
+# ----------------------------------------------------------------
 def main():
     st.title("Mobileye Newsletter Generator")
     st.markdown("Generate your weekly Mobileye newsletter using a clean, modern interface.")
 
-    # Overall Prompt Section
+    # Save/Load Draft Functionality in the Sidebar
+    st.sidebar.header("Drafts")
+    if st.sidebar.button("Save Draft"):
+        save_draft()
+
+    draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
+    draft_files.sort(reverse=True)  # Latest drafts first
+    selected_draft = st.sidebar.selectbox("Select a draft to load", options=draft_files) if draft_files else None
+    if st.sidebar.button("Load Draft") and selected_draft:
+        load_draft(selected_draft)
+
+    # ----------------------------------------------------------------
+    # Input Fields (with keys and default values from session_state)
     st.subheader("Overall Prompt")
-    overall_prompt = st.text_area("Overall Prompt", value=DEFAULT_PROMPTS["overall"], height=150)
+    overall_prompt = st.text_area(
+        "Overall Prompt",
+        value=st.session_state.get("overall_prompt", DEFAULT_PROMPTS["overall"]),
+        height=150,
+        key="overall_prompt"
+    )
 
     # Dictionary to store generated content for each section
     generated_sections = {}
 
     # Windshield View Section
     st.subheader("Windshield View")
-    windshield_urls = st.text_input("Enter article URLs (separated by ';;')", key="windshield_urls")
-    windshield_notes = st.text_area("Notes", key="windshield_notes", height=100)
-    windshield_prompt = st.text_area("Section Prompt", value=DEFAULT_PROMPTS["windshield"], key="windshield_prompt", height=100)
+    windshield_urls = st.text_input(
+        "Enter article URLs (separated by ';;')",
+        value=st.session_state.get("windshield_urls", ""),
+        key="windshield_urls"
+    )
+    windshield_notes = st.text_area(
+        "Notes",
+        value=st.session_state.get("windshield_notes", ""),
+        key="windshield_notes",
+        height=100
+    )
+    windshield_prompt = st.text_area(
+        "Section Prompt",
+        value=st.session_state.get("windshield_prompt", DEFAULT_PROMPTS["windshield"]),
+        key="windshield_prompt",
+        height=100
+    )
     if st.button("Generate Windshield Section"):
         with st.spinner("Generating Windshield section..."):
             article_text = extract_article_text(windshield_urls)
@@ -141,13 +216,34 @@ def main():
 
     # Rearview Mirror Section (multiple stories)
     st.subheader("Rearview Mirror (Multiple Stories)")
-    num_rearview = st.number_input("Number of Rearview Stories", min_value=1, max_value=5, value=3, step=1)
+    num_rearview = st.number_input(
+        "Number of Rearview Stories",
+        min_value=1,
+        max_value=5,
+        value=st.session_state.get("num_rearview", 3),
+        step=1,
+        key="num_rearview"
+    )
     rearview_generated = {}
-    for i in range(1, num_rearview + 1):
+    for i in range(1, int(num_rearview) + 1):
         st.markdown(f"**Story {i}**")
-        story_urls = st.text_input(f"Story {i} URLs (separated by ';;')", key=f"rearview_urls_{i}")
-        story_notes = st.text_area(f"Story {i} Notes", key=f"rearview_notes_{i}", height=80)
-        story_prompt = st.text_area(f"Story {i} Prompt", value=DEFAULT_PROMPTS["rearview"], key=f"rearview_prompt_{i}", height=80)
+        story_urls = st.text_input(
+            f"Story {i} URLs (separated by ';;')",
+            value=st.session_state.get(f"rearview_urls_{i}", ""),
+            key=f"rearview_urls_{i}"
+        )
+        story_notes = st.text_area(
+            f"Story {i} Notes",
+            value=st.session_state.get(f"rearview_notes_{i}", ""),
+            key=f"rearview_notes_{i}",
+            height=80
+        )
+        story_prompt = st.text_area(
+            f"Story {i} Prompt",
+            value=st.session_state.get(f"rearview_prompt_{i}", DEFAULT_PROMPTS["rearview"]),
+            key=f"rearview_prompt_{i}",
+            height=80
+        )
         if st.button(f"Generate Story {i}", key=f"generate_rearview_{i}"):
             with st.spinner(f"Generating Rearview Story {i}..."):
                 article_text = extract_article_text(story_urls)
@@ -159,9 +255,23 @@ def main():
 
     # Dashboard Data Section
     st.subheader("Dashboard Data")
-    dashboard_urls = st.text_input("Enter article URLs (separated by ';;')", key="dashboard_urls")
-    dashboard_notes = st.text_area("Notes", key="dashboard_notes", height=100)
-    dashboard_prompt = st.text_area("Section Prompt", value=DEFAULT_PROMPTS["dashboard"], key="dashboard_prompt", height=100)
+    dashboard_urls = st.text_input(
+        "Enter article URLs (separated by ';;')",
+        value=st.session_state.get("dashboard_urls", ""),
+        key="dashboard_urls"
+    )
+    dashboard_notes = st.text_area(
+        "Notes",
+        value=st.session_state.get("dashboard_notes", ""),
+        key="dashboard_notes",
+        height=100
+    )
+    dashboard_prompt = st.text_area(
+        "Section Prompt",
+        value=st.session_state.get("dashboard_prompt", DEFAULT_PROMPTS["dashboard"]),
+        key="dashboard_prompt",
+        height=100
+    )
     if st.button("Generate Dashboard Section"):
         with st.spinner("Generating Dashboard section..."):
             article_text = extract_article_text(dashboard_urls)
@@ -172,9 +282,23 @@ def main():
 
     # The Next Lane Section
     st.subheader("The Next Lane")
-    nextlane_urls = st.text_input("Enter article URLs (separated by ';;')", key="nextlane_urls")
-    nextlane_notes = st.text_area("Notes", key="nextlane_notes", height=100)
-    nextlane_prompt = st.text_area("Section Prompt", value=DEFAULT_PROMPTS["nextlane"], key="nextlane_prompt", height=100)
+    nextlane_urls = st.text_input(
+        "Enter article URLs (separated by ';;')",
+        value=st.session_state.get("nextlane_urls", ""),
+        key="nextlane_urls"
+    )
+    nextlane_notes = st.text_area(
+        "Notes",
+        value=st.session_state.get("nextlane_notes", ""),
+        key="nextlane_notes",
+        height=100
+    )
+    nextlane_prompt = st.text_area(
+        "Section Prompt",
+        value=st.session_state.get("nextlane_prompt", DEFAULT_PROMPTS["nextlane"]),
+        key="nextlane_prompt",
+        height=100
+    )
     if st.button("Generate Next Lane Section"):
         with st.spinner("Generating The Next Lane section..."):
             article_text = extract_article_text(nextlane_urls)
