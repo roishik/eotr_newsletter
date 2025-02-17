@@ -7,6 +7,8 @@ import os
 import json
 import streamlit.components.v1 as components
 
+st.set_page_config(page_title="Mobileye Newsletter Generator", layout="wide")
+
 # Set up your OpenAI API key (make sure the OPENAI_API_KEY environment variable is set)
 client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -177,21 +179,26 @@ def main():
     st.title("Mobileye Newsletter Generator")
     st.markdown("Generate your weekly Mobileye newsletter using a clean, modern interface.")
 
-    # Save/Load Draft Functionality in the Sidebar
-    st.sidebar.header("Drafts")
-    if st.sidebar.button("Save Draft"):
-        save_draft()
-    draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
-    draft_files.sort(reverse=True)  # Latest drafts first
-    selected_draft = st.sidebar.selectbox("Select a draft to load", options=draft_files) if draft_files else None
-    if st.sidebar.button("Load Draft") and selected_draft:
-        load_draft(selected_draft)
+    # Create two equal columns: left for the combined Save/Load and Main Panel (each 25% of the screen) and right for the Generated Content (50% of the screen)
+    left_col, right_col = st.columns([1, 1])
 
-    # Create two-column layout: left for inputs and right for summary panel
-    left_col, right_col = st.columns([2, 1])
 
     with left_col:
-        # Overall Prompt
+        # --- Begin Save/Load Container ---
+        with st.container():
+            st.header("Drafts")
+            if st.button("Save Draft", key="save_draft_btn"):
+                save_draft()
+                
+            draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
+            draft_files.sort(reverse=True)  # Latest drafts first
+            selected_draft = st.selectbox("Select a draft to load", options=draft_files, key="draft_select") if draft_files else None
+            if st.button("Load Draft", key="load_draft_btn") and selected_draft:
+                load_draft(selected_draft)
+        # --- End Save/Load Container ---
+
+        # --- Begin Main Panel (Inputs) ---
+        st.header("Main Panel")
         st.subheader("Overall Prompt")
         overall_prompt = st.text_area(
             "Overall Prompt",
