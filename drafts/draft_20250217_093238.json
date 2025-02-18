@@ -1,0 +1,32 @@
+{
+    "overall_prompt": "You are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary\u2014just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging. Keep the response concise and focused on the key points.",
+    "windshield_urls": "https://techcrunch.com/2025/02/10/lyft-to-launch-mobileye-powered-robotaxis-as-soon-as-2026-starting-with-dallas/",
+    "windshield_notes": "Will we see Mobileye-operated robotaxis in 2026?\nprobably not - but this effort could be our north star and push us toward L5 autonomous levels.",
+    "windshield_prompt": "Summarize the articles in 2\u20133 concise paragraphs focusing on their relevance to Mobileye\u2019s work. Please be succinct and avoid unnecessary details.",
+    "num_rearview": 3,
+    "dashboard_urls": "",
+    "dashboard_notes": "",
+    "dashboard_prompt": "Write 3 parts:\n- What's New: Describe key trends or insights concisely.\n- Why It Matters: Explain the impact on Mobileye succinctly.\n- What I Think: Share a brief personal opinion.",
+    "nextlane_urls": "",
+    "nextlane_notes": "",
+    "nextlane_prompt": "Summarize competitor/academic news in 2\u20133 concise paragraphs, highlighting its implications for Mobileye. Keep it brief and to the point.",
+    "generated_sections": {
+        "Windshield View": "Exciting news for us here at Mobileye! Lyft has announced plans to integrate fully autonomous robotaxis, powered by our technology, into its app by 2026, starting in Dallas. This collaboration is a significant step forward in the autonomous vehicle (AV) industry and highlights our role as a leader in this space. The partnership with Marubeni, which will own and finance the fleet, underscores the importance of collaborations in scaling AV operations. Our advanced driver-assistance systems, already trusted by major car manufacturers like Audi and Ford, are at the heart of this promising venture.\n\nLyft's focus on an asset-light business model aligns perfectly with our strengths. By combining our cutting-edge technology with Marubeni's fleet management expertise and Lyft's platform, we're setting the stage for a more widespread adoption of autonomous ride-hailing services. This initiative not only positions us against competitors like Waymo and Tesla but also emphasizes the growing significance of strategic partnerships in the AV industry. It's exciting to see how these developments could serve as a guiding beacon towards achieving Level 5 autonomy\u2014an ambition that continues to drive innovation and progress.\n\nWhile Lyft has faced challenges in the past, such as shifts in partnerships and investments, the current trajectory is promising. Their strategy to collaborate with a variety of AV developers, including our collaboration, showcases a robust approach to market penetration. This move not only enhances our presence in the autonomous vehicle landscape but also reinforces our commitment to shaping the future of transportation. The journey ahead is filled with",
+        "Rearview Mirror 1": "**Volkswagen's Electric Leap Forward**  \nVolkswagen is charging into the future with its upcoming affordable electric city car, potentially named the ID.1, priced around \u20ac20,000, while also planning to produce future Golf and T-Roc models with electric options in Mexico, aiming to solidify its position in the competitive EV market."
+    },
+    "rearview_urls_1": "https://www.icar.co.il/news/r1w00nxzt1g/;;https://www.theverge.com/news/607157/volkswagen-cheap-ev-id-1-march-reveal-2027-production",
+    "rearview_notes_1": "VW is trying to shake its past failures and create offering in the electric vehicles space. Also worth noticing the moving of a big part of the production outside of China and into Mexico.",
+    "rearview_prompt_1": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_2": "",
+    "rearview_notes_2": "",
+    "rearview_prompt_2": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_3": "",
+    "rearview_notes_3": "",
+    "rearview_prompt_3": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_4": "",
+    "rearview_notes_4": "",
+    "rearview_prompt_4": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_5": "",
+    "rearview_notes_5": "",
+    "rearview_prompt_5": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total."
+}

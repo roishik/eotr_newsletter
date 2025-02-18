@@ -19,13 +19,19 @@ os.makedirs("drafts", exist_ok=True)
 # Updated default prompts with explicit style instructions for the overall prompt
 DEFAULT_PROMPTS = {
     "overall": (
+        "What are you doing?:\n"
         "You are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. "
         "Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). "
+        "\nWriting style:\n"
         "Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, "
         "mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary—"
         "just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. "
         "Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging. "
+        "Don't be too optimistic and avoid make announcements that are bigger than the actual news."
+        "\nLenght\n"
         "Keep the response concise and focused on the key points."
+        "\nWhat to write about?\n"
+        "Offer a new lens on the news, providing a fresh perspective or a unique angle that doubts the status quo or offers a new way of thinking."
     ),
     "windshield": (
         "Summarize the articles in 2–3 concise paragraphs focusing on their relevance to Mobileye’s work. "
@@ -82,7 +88,7 @@ def load_draft(filename):
     for key, value in draft_data.items():
         st.session_state[key] = value
     st.sidebar.success("Draft loaded!")
-    st.experimental_rerun()
+    st.rerun()
 
 # ----------------------------------------------------------------
 # Functions for newsletter generation
@@ -179,24 +185,23 @@ def main():
     st.title("Mobileye Newsletter Generator")
     st.markdown("Generate your weekly Mobileye newsletter using a clean, modern interface.")
 
-    # Create two equal columns: left for the combined Save/Load and Main Panel (each 25% of the screen) and right for the Generated Content (50% of the screen)
-    left_col, right_col = st.columns([1, 1])
+    # Create three columns: left for Save/Load (25%), middle for Main Panel (25%), and right for Generated Content (50%)
+    left_panel, main_panel, right_panel = st.columns([1, 1, 2])
 
 
-    with left_col:
-        # --- Begin Save/Load Container ---
-        with st.container():
-            st.header("Drafts")
-            if st.button("Save Draft", key="save_draft_btn"):
-                save_draft()
-                
-            draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
-            draft_files.sort(reverse=True)  # Latest drafts first
-            selected_draft = st.selectbox("Select a draft to load", options=draft_files, key="draft_select") if draft_files else None
-            if st.button("Load Draft", key="load_draft_btn") and selected_draft:
-                load_draft(selected_draft)
-        # --- End Save/Load Container ---
 
+    with left_panel:
+        st.header("Drafts")
+        if st.button("Save Draft", key="left_save_draft_btn"):
+            save_draft()
+                    
+        draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
+        draft_files.sort(reverse=True)  # Latest drafts first
+        selected_draft = st.selectbox("Select a draft to load", options=draft_files, key="left_draft_select") if draft_files else None
+        if st.button("Load Draft", key="left_load_draft_btn") and selected_draft:
+            load_draft(selected_draft)
+
+    with main_panel:
         # --- Begin Main Panel (Inputs) ---
         st.header("Main Panel")
         st.subheader("Overall Prompt")
@@ -360,7 +365,7 @@ def main():
                     mime="text/html"
                 )
 
-    with right_col:
+    with right_panel:
         st.header("Newsletter Summary")
         st.markdown("This panel displays the generated sections in fixed order. If a section has not been generated yet, a placeholder is shown.")
         def display_section(title, content):
