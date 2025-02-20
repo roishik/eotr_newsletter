@@ -183,8 +183,8 @@ def main():
     st.title("Mobileye Newsletter Generator")
     st.markdown("Generate your weekly Mobileye newsletter using a clean, modern interface.")
 
-    # Create three columns: left for Save/Load (25%), middle for Main Panel (25%), and right for Generated Content (50%)
-    left_panel, main_panel, right_panel = st.columns([1, 1, 2])
+    # Create two columns: middle for Main Panel (33%), and right for Generated Content (67%%)
+    main_panel, right_panel = st.columns([1, 2])
 
     # Add model selection to the sidebar
     st.sidebar.header("Model Selection")
@@ -213,16 +213,20 @@ def main():
             f"{provider} API Key: {'✅' if status else '❌'}"
         )   
 
-    with left_panel:
-        st.header("Drafts")
-        if st.button("Save Draft", key="left_save_draft_btn"):
-            save_draft()
-                    
-        draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
-        draft_files.sort(reverse=True)  # Latest drafts first
-        selected_draft = st.selectbox("Select a draft to load", options=draft_files, key="left_draft_select") if draft_files else None
-        if st.button("Load Draft", key="left_load_draft_btn") and selected_draft:
-            load_draft(selected_draft)
+    # Add drafts section to sidebar
+    st.sidebar.markdown("---")  # Add a separator
+    st.sidebar.header("Drafts")
+    if st.sidebar.button("Save Draft"):
+        save_draft()
+                
+    draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
+    draft_files.sort(reverse=True)  # Latest drafts first
+    selected_draft = st.sidebar.selectbox(
+        "Select a draft to load", 
+        options=draft_files
+    ) if draft_files else None
+    if st.sidebar.button("Load Draft") and selected_draft:
+        load_draft(selected_draft)
 
     with main_panel:
         # --- Begin Main Panel (Inputs) ---
