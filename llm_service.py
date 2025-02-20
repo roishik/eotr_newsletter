@@ -23,9 +23,9 @@ class LLMService:
                 "gpt-4o-mini": ModelConfig("GPT-4o mini")
             },
             "Anthropic": {
-                "claude-3-opus-20240229": ModelConfig("Claude 3 Opus"),
-                "claude-3-sonnet-20240229": ModelConfig("Claude 3.5 Sonnet"),
-                "claude-3-haiku-20240307": ModelConfig("Claude 3 Haiku")
+                "claude-3-5-sonnet-latest": ModelConfig("Claude 3.5 Sonnet"),
+                "claude-3-haiku-20240307": ModelConfig("Claude 3 Opus"),
+                "claude-3-5-haiku-latest": ModelConfig("Claude 3 Haiku")
             }
         }
 
@@ -84,8 +84,8 @@ class LLMService:
         response = self.anthropic_client.messages.create(
             model=model,
             max_tokens=self.MODELS["Anthropic"][model].max_tokens,
+            system=system_prompt,
             messages=[
-                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ]
         )

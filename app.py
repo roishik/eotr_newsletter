@@ -22,6 +22,7 @@ DEFAULT_PROMPTS = {
         "What are you doing?:\n"
         "You are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. "
         "Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). "
+        "Avoid AI chatbot indroductions, such as 'here is the responce to your request'."
         "\nWriting style:\n"
         "Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, "
         "mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary—"
