@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
-import openai
+from llm_service import LLMService
 import datetime
 import os
 import json
@@ -9,8 +9,8 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Mobileye Newsletter Generator", layout="wide")
 
-# Set up your OpenAI API key (make sure the OPENAI_API_KEY environment variable is set)
-client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize LLM service
+llm_service = LLMService()
 
 # Create necessary directories
 os.makedirs("drafts", exist_ok=True)
@@ -69,7 +69,9 @@ def save_draft():
         "nextlane_urls": st.session_state.get("nextlane_urls", ""),
         "nextlane_notes": st.session_state.get("nextlane_notes", ""),
         "nextlane_prompt": st.session_state.get("nextlane_prompt", DEFAULT_PROMPTS["nextlane"]),
-        "generated_sections": st.session_state.get("generated_sections", {})
+        "generated_sections": st.session_state.get("generated_sections", {}),
+        "selected_provider": st.session_state.get("selected_provider", "OpenAI"),
+        "selected_model": st.session_state.get("selected_model", "gpt-4o"),
     }
     for i in range(1, 6):
         draft_data[f"rearview_urls_{i}"] = st.session_state.get(f"rearview_urls_{i}", "")
@@ -110,26 +112,22 @@ def extract_article_text(urls):
     return combined_text.strip()
 
 def generate_section_content(section_key, article_text, notes, section_prompt):
-    """Generates content using OpenAI's API with a reduced token limit."""
+    """Generates content using the selected model through LLM service."""
     user_content = (
         f"{section_prompt}\n\nCombined Article Content:\n{article_text}\n\nNotes: {notes if notes else ''}"
     )
-    messages = [
-        {"role": "system", "content": DEFAULT_PROMPTS["overall"]},
-        {"role": "user", "content": user_content}
-    ]
+    
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            temperature=0.7,
-            max_tokens=300  # reduced token limit for brevity
+        generated_text = llm_service.generate_content(
+            provider=st.session_state.get("selected_provider", "OpenAI"),
+            model=st.session_state.get("selected_model", "gpt-4o"),
+            system_prompt=DEFAULT_PROMPTS["overall"],
+            user_prompt=user_content
         )
-        generated_text = response.choices[0].message.content.strip()
+        return generated_text
     except Exception as e:
-        st.error(f"Error generating content: {e}")
-        generated_text = ""
-    return generated_text
+        st.error(str(e))
+        return ""
 
 def generate_newsletter_html(sections_content):
     """Creates a clean, modern HTML template for the newsletter."""
@@ -188,7 +186,32 @@ def main():
     # Create three columns: left for Save/Load (25%), middle for Main Panel (25%), and right for Generated Content (50%)
     left_panel, main_panel, right_panel = st.columns([1, 1, 2])
 
+    # Add model selection to the sidebar
+    st.sidebar.header("Model Selection")
 
+    # Provider selection
+    selected_provider = st.sidebar.selectbox(
+        "Select Provider",
+        options=llm_service.get_providers(),
+        key="selected_provider"
+    )
+
+    # Model selection based on provider
+    models = llm_service.get_models(selected_provider)
+    selected_model = st.sidebar.selectbox(
+        "Select Model",
+        options=list(models.keys()),
+        format_func=lambda x: models[x],
+        key="selected_model"
+    )
+
+    # API key status indicators
+    st.sidebar.markdown("### API Key Status")
+    api_status = llm_service.check_api_keys()
+    for provider, status in api_status.items():
+        st.sidebar.markdown(
+            f"{provider} API Key: {'✅' if status else '❌'}"
+        )   
 
     with left_panel:
         st.header("Drafts")

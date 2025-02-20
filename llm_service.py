@@ -19,9 +19,8 @@ class LLMService:
         # Define available models and their configurations
         self.MODELS = {
             "OpenAI": {
-                "gpt-4": ModelConfig("GPT-4"),
-                "gpt-4-turbo-preview": ModelConfig("GPT-4 Turbo"),
-                "gpt-3.5-turbo": ModelConfig("GPT-3.5 Turbo")
+                "gpt-4o": ModelConfig("GPT-4o"),
+                "gpt-4o-mini": ModelConfig("GPT-4o mini")
             },
             "Anthropic": {
                 "claude-3-opus-20240229": ModelConfig("Claude 3 Opus"),
