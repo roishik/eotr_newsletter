@@ -1,3 +1,5 @@
+#!/Users/roishi/miniconda3/envs/eotr_newsletter/bin/python
+
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
@@ -130,41 +132,75 @@ def generate_section_content(section_key, article_text, notes, section_prompt):
         st.error(str(e))
         return ""
 
-def generate_newsletter_html(sections_content):
-    """Creates a clean, modern HTML template for the newsletter."""
-    html_template = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Mobileye Newsletter</title>
+def generate_newsletter_html(sections_content, theme="light"):
+    if theme.lower() == "dark":
+        style = """
         <style>
-            body {{
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 40px;
+                background-color: #303134;
+                color: #e8eaed;
+            }
+            .container {
+                max-width: 800px;
+                margin: auto;
+                background-color: #3c4043;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            h1 {
+                text-align: center;
+                color: #8ab4f8;
+            }
+            .section {
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #5f6368;
+            }
+            .section h2 {
+                color: #8ab4f8;
+            }
+        </style>
+        """
+    else:
+        style = """
+        <style>
+            body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 margin: 40px;
                 background-color: #f4f4f9;
                 color: #333;
-            }}
-            .container {{
+            }
+            .container {
                 max-width: 800px;
                 margin: auto;
                 background-color: #fff;
                 padding: 20px;
                 border-radius: 8px;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }}
-            h1 {{
+            }
+            h1 {
                 text-align: center;
                 color: #2e6c80;
-            }}
-            .section {{
+            }
+            .section {
                 margin-bottom: 30px;
                 padding-bottom: 20px;
                 border-bottom: 1px solid #ddd;
-            }}
-            .section h2 {{
+            }
+            .section h2 {
                 color: #2e6c80;
-            }}
+            }
         </style>
+        """
+    html_template = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Mobileye Newsletter</title>
+        {style}
     </head>
     <body>
         <div class="container">
@@ -189,6 +225,43 @@ def main():
 
     # Add model selection to the sidebar
     st.sidebar.header("Model Selection")
+    theme = st.sidebar.radio("Select Theme", options=["Light", "Dark"], index=0)
+    if theme == "Dark":
+        st.markdown(
+            """
+            <style>
+            /* This targets the entire app container */
+            .stApp {
+                background-color: #303134;
+                color: #e8eaed;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    # Update the generate buttons look
+    if theme == "Dark":
+        st.markdown(
+            """
+            <style>
+            /* Overall app styling for dark mode */
+            .stApp {
+                background-color: #303134;
+                color: #e8eaed;
+            }
+            /* Styling for Streamlit buttons in dark mode */
+            .stButton button {
+                background-color: #5f6368;
+                color: #ffffff; /* Use bright white text for better contrast */
+                border: none;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+
 
     # Provider selection
     selected_provider = st.sidebar.selectbox(
@@ -383,7 +456,7 @@ def main():
                         <p>{content}</p>
                     </div>
                     """
-                newsletter_html = generate_newsletter_html(sections_content)
+                newsletter_html = generate_newsletter_html(sections_content, theme=theme)
                 st.success("Newsletter Created!")
                 components.html(newsletter_html, height=600, scrolling=True)
                 st.download_button(
