@@ -239,7 +239,7 @@ def main():
             """,
             unsafe_allow_html=True
         )
-    # Update the generate buttons look
+    # Update the generate buttons look for dark mode
     if theme == "Dark":
         st.markdown(
             """
@@ -252,13 +252,18 @@ def main():
             /* Styling for Streamlit buttons in dark mode */
             .stButton button {
                 background-color: #5f6368;
-                color: #ffffff; /* Use bright white text for better contrast */
+                color: #ffffff; /* Bright white text for contrast */
                 border: none;
+            }
+            /* Override default label colors to ensure they are visible */
+            label {
+                color: #e8eaed !important;
             }
             </style>
             """,
             unsafe_allow_html=True
         )
+
 
 
 
