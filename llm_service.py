@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 @dataclass
 class ModelConfig:
     display_name: str
-    max_tokens: int = 300
+    max_tokens: int = 500
     temperature: float = 0.7
 
 class LLMService:
