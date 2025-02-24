@@ -91,8 +91,16 @@ def load_draft(filename):
     """Loads the selected draft and updates session state accordingly."""
     with open(f"drafts/{filename}", "r") as f:
         draft_data = json.load(f)
+    
+    # Save the loaded provider and model separately for display
+    st.session_state["loaded_provider"] = draft_data.get("selected_provider", "Unknown")
+    st.session_state["loaded_model"] = draft_data.get("selected_model", "Unknown")
+
+
     for key, value in draft_data.items():
-        st.session_state[key] = value
+        if key not in ["selected_provider", "selected_model"]: # don't update the provider/model due to streamlit limitation
+            st.session_state[key] = value
+
     st.sidebar.success("Draft loaded!")
     st.rerun()
 
@@ -307,6 +315,11 @@ def main():
     ) if draft_files else None
     if st.sidebar.button("Load Draft") and selected_draft:
         load_draft(selected_draft)
+
+    # Display loaded provider/model if available
+    if "loaded_provider" in st.session_state and "loaded_model" in st.session_state:
+        st.sidebar.info(f"The provider on the loaded version was {st.session_state['loaded_provider']} with model {st.session_state['loaded_model']}")
+
 
     with main_panel:
         # --- Begin Main Panel (Inputs) ---
