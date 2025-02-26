@@ -63,20 +63,17 @@ def render_news_discovery():
                 page_size=20
             )
 
-        # Store results in session state
+        # Store results in session state without resetting selected articles
         st.session_state["search_results"] = articles
-        st.session_state["selected_articles"] = []  # Reset selections when new search happens
 
     # -- Display results if they exist
     articles = st.session_state["search_results"]
+    selected_articles = st.session_state["selected_articles"]
     
     if not articles:
         st.info("Enter your criteria and press 'Search News' to begin.")
     else:
         st.success(f"Found {len(articles)} articles!")
-
-        # Use a dictionary to track selection state
-        selected_articles = st.session_state["selected_articles"]
 
         for idx, article in enumerate(articles):
             title = article["title"]
@@ -86,14 +83,14 @@ def render_news_discovery():
             trending_icon = "🔥" if idx < 3 else ""
 
             # Checkbox for selection (persistent using session state)
-            checked = title in [a["title"] for a in selected_articles]
+            checked = any(a["title"] == title for a in selected_articles)
             is_selected = st.checkbox(f"{trending_icon} {title}", value=checked, key=f"article_{idx}")
 
             # Handle selection persistence
-            if is_selected and article not in selected_articles:
+            if is_selected and not any(a["title"] == title for a in selected_articles):
                 selected_articles.append(article)
-            elif not is_selected and article in selected_articles:
-                selected_articles.remove(article)
+            elif not is_selected:
+                selected_articles = [a for a in selected_articles if a["title"] != title]
 
             # Show article details
             st.write(f"**Source**: {source} | **Date**: {published}")
@@ -104,8 +101,8 @@ def render_news_discovery():
         # Update session state with selections
         st.session_state["selected_articles"] = selected_articles
 
-        # Show selected articles
-        if selected_articles:
-            st.subheader("Saved Articles:")
-            for article in selected_articles:
-                st.write(f"✅ {article['title']}")
+    # Show selected articles
+    if selected_articles:
+        st.subheader("Saved Articles:")
+        for article in selected_articles:
+            st.markdown(f"✅ [{article['title']}]({article['url']})")

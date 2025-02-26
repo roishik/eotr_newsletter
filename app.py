@@ -506,7 +506,7 @@ def main():
     elif section == "Discover News":
         render_news_discovery()
         # Optionally display selected articles for debugging
-        st.write("Selected Articles:", st.session_state.get("discovered_articles", []))
+        # st.write("Selected Articles:", st.session_state.get("selected_articles", []))
 
 if __name__ == "__main__":
     main()
