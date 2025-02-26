@@ -8,6 +8,7 @@ import datetime
 import os
 import json
 import streamlit.components.v1 as components
+from discovery_view import render_news_discovery
 
 st.set_page_config(page_title="Mobileye Newsletter Generator", layout="wide")
 
@@ -228,276 +229,284 @@ def main():
 
     st.title("Mobileye Newsletter Generator")
     st.markdown("Generate your weekly Mobileye newsletter using a clean, modern interface.")
+    section = st.sidebar.radio("Choose Section", ["Newsletter", "Discover News"])
 
-    # Create two columns: middle for Main Panel (33%), and right for Generated Content (67%%)
-    main_panel, right_panel = st.columns([1, 2])
+    if section == "Newsletter":
 
-    # Add model selection to the sidebar
-    st.sidebar.header("Model Selection")
-    theme = st.sidebar.radio("Select Theme", options=["Light", "Dark"], index=0)
-    if theme == "Dark":
-        st.markdown(
-            """
-            <style>
-            /* This targets the entire app container */
-            .stApp {
-                background-color: #303134;
-                color: #e8eaed;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-    # Update the generate buttons look for dark mode
-    if theme == "Dark":
-        st.markdown(
-            """
-            <style>
-            /* Overall app styling for dark mode */
-            .stApp {
-                background-color: #303134;
-                color: #e8eaed;
-            }
-            /* Styling for Streamlit buttons in dark mode */
-            .stButton button {
-                background-color: #5f6368;
-                color: #ffffff; /* Bright white text for contrast */
-                border: none;
-            }
-            /* Override default label colors to ensure they are visible */
-            label {
-                color: #e8eaed !important;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+        # Create two columns: middle for Main Panel (33%), and right for Generated Content (67%%)
+        main_panel, right_panel = st.columns([1, 2])
 
-
-
-
-
-    # Provider selection
-    selected_provider = st.sidebar.selectbox(
-        "Select Provider",
-        options=llm_service.get_providers(),
-        key="selected_provider"
-    )
-
-    # Model selection based on provider
-    models = llm_service.get_models(selected_provider)
-    selected_model = st.sidebar.selectbox(
-        "Select Model",
-        options=list(models.keys()),
-        format_func=lambda x: models[x],
-        key="selected_model"
-    )
-
-    # API key status indicators
-    st.sidebar.markdown("### API Key Status")
-    api_status = llm_service.check_api_keys()
-    for provider, status in api_status.items():
-        st.sidebar.markdown(
-            f"{provider} API Key: {'✅' if status else '❌'}"
-        )   
-
-    # Add drafts section to sidebar
-    st.sidebar.markdown("---")  # Add a separator
-    st.sidebar.header("Drafts")
-    if st.sidebar.button("Save Draft"):
-        save_draft()
-                
-    draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
-    draft_files.sort(reverse=True)  # Latest drafts first
-    selected_draft = st.sidebar.selectbox(
-        "Select a draft to load", 
-        options=draft_files
-    ) if draft_files else None
-    if st.sidebar.button("Load Draft") and selected_draft:
-        load_draft(selected_draft)
-
-    # Display loaded provider/model if available
-    if "loaded_provider" in st.session_state and "loaded_model" in st.session_state:
-        st.sidebar.info(f"The provider on the loaded version was {st.session_state['loaded_provider']} with model {st.session_state['loaded_model']}")
-
-
-    with main_panel:
-        # --- Begin Main Panel (Inputs) ---
-        st.header("Main Panel")
-        st.subheader("Overall Prompt")
-        overall_prompt = st.text_area(
-            "Overall Prompt",
-            value=st.session_state.get("overall_prompt", DEFAULT_PROMPTS["overall"]),
-            height=150,
-            key="overall_prompt"
-        )
-
-        # Windshield View Section
-        st.subheader("Windshield View")
-        windshield_urls = st.text_input(
-            "Enter article URLs (separated by ';;')",
-            value=st.session_state.get("windshield_urls", ""),
-            key="windshield_urls"
-        )
-        windshield_notes = st.text_area(
-            "Notes",
-            value=st.session_state.get("windshield_notes", ""),
-            key="windshield_notes",
-            height=100
-        )
-        windshield_prompt = st.text_area(
-            "Section Prompt",
-            value=st.session_state.get("windshield_prompt", DEFAULT_PROMPTS["windshield"]),
-            key="windshield_prompt",
-            height=100
-        )
-        if st.button("Generate Windshield Section"):
-            with st.spinner("Generating Windshield section..."):
-                article_text = extract_article_text(windshield_urls)
-                generated_text = generate_section_content("windshield", article_text, windshield_notes, windshield_prompt)
-                st.success("Windshield section generated!")
-                st.write(generated_text)
-                st.session_state.generated_sections["Windshield View"] = generated_text
-
-        # Rearview Mirror Section (multiple stories)
-        st.subheader("Rearview Mirror (Multiple Stories)")
-        num_rearview = st.number_input(
-            "Number of Rearview Stories",
-            min_value=1,
-            max_value=5,
-            value=st.session_state.get("num_rearview", 3),
-            step=1,
-            key="num_rearview"
-        )
-        for i in range(1, int(num_rearview) + 1):
-            st.markdown(f"**Story {i}**")
-            story_urls = st.text_input(
-                f"Story {i} URLs (separated by ';;')",
-                value=st.session_state.get(f"rearview_urls_{i}", ""),
-                key=f"rearview_urls_{i}"
+        # Add model selection to the sidebar
+        st.sidebar.header("Model Selection")
+        theme = st.sidebar.radio("Select Theme", options=["Light", "Dark"], index=0)
+        if theme == "Dark":
+            st.markdown(
+                """
+                <style>
+                /* This targets the entire app container */
+                .stApp {
+                    background-color: #303134;
+                    color: #e8eaed;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
             )
-            story_notes = st.text_area(
-                f"Story {i} Notes",
-                value=st.session_state.get(f"rearview_notes_{i}", ""),
-                key=f"rearview_notes_{i}",
-                height=80
+        # Update the generate buttons look for dark mode
+        if theme == "Dark":
+            st.markdown(
+                """
+                <style>
+                /* Overall app styling for dark mode */
+                .stApp {
+                    background-color: #303134;
+                    color: #e8eaed;
+                }
+                /* Styling for Streamlit buttons in dark mode */
+                .stButton button {
+                    background-color: #5f6368;
+                    color: #ffffff; /* Bright white text for contrast */
+                    border: none;
+                }
+                /* Override default label colors to ensure they are visible */
+                label {
+                    color: #e8eaed !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
             )
-            story_prompt = st.text_area(
-                f"Story {i} Prompt",
-                value=st.session_state.get(f"rearview_prompt_{i}", DEFAULT_PROMPTS["rearview"]),
-                key=f"rearview_prompt_{i}",
-                height=80
+
+
+
+
+
+        # Provider selection
+        selected_provider = st.sidebar.selectbox(
+            "Select Provider",
+            options=llm_service.get_providers(),
+            key="selected_provider"
+        )
+
+        # Model selection based on provider
+        models = llm_service.get_models(selected_provider)
+        selected_model = st.sidebar.selectbox(
+            "Select Model",
+            options=list(models.keys()),
+            format_func=lambda x: models[x],
+            key="selected_model"
+        )
+
+        # API key status indicators
+        st.sidebar.markdown("### API Key Status")
+        api_status = llm_service.check_api_keys()
+        for provider, status in api_status.items():
+            st.sidebar.markdown(
+                f"{provider} API Key: {'✅' if status else '❌'}"
+            )   
+
+        # Add drafts section to sidebar
+        st.sidebar.markdown("---")  # Add a separator
+        st.sidebar.header("Drafts")
+        if st.sidebar.button("Save Draft"):
+            save_draft()
+                    
+        draft_files = [f for f in os.listdir("drafts") if f.endswith(".json")]
+        draft_files.sort(reverse=True)  # Latest drafts first
+        selected_draft = st.sidebar.selectbox(
+            "Select a draft to load", 
+            options=draft_files
+        ) if draft_files else None
+        if st.sidebar.button("Load Draft") and selected_draft:
+            load_draft(selected_draft)
+
+        # Display loaded provider/model if available
+        if "loaded_provider" in st.session_state and "loaded_model" in st.session_state:
+            st.sidebar.info(f"The provider on the loaded version was {st.session_state['loaded_provider']} with model {st.session_state['loaded_model']}")
+
+
+        with main_panel:
+            # --- Begin Main Panel (Inputs) ---
+            st.header("Main Panel")
+            st.subheader("Overall Prompt")
+            overall_prompt = st.text_area(
+                "Overall Prompt",
+                value=st.session_state.get("overall_prompt", DEFAULT_PROMPTS["overall"]),
+                height=150,
+                key="overall_prompt"
             )
-            if st.button(f"Generate Rearview {i} Section"):
-                with st.spinner(f"Generating Rearview {i} section..."):
-                    article_text = extract_article_text(st.session_state[f"rearview_urls_{i}"])
-                    generated_text = generate_section_content(
-                        "rearview",
-                        article_text,
-                        st.session_state[f"rearview_notes_{i}"],
-                        st.session_state[f"rearview_prompt_{i}"]
-                    )
-                    st.success(f"Rearview {i} section generated!")
+
+            # Windshield View Section
+            st.subheader("Windshield View")
+            windshield_urls = st.text_input(
+                "Enter article URLs (separated by ';;')",
+                value=st.session_state.get("windshield_urls", ""),
+                key="windshield_urls"
+            )
+            windshield_notes = st.text_area(
+                "Notes",
+                value=st.session_state.get("windshield_notes", ""),
+                key="windshield_notes",
+                height=100
+            )
+            windshield_prompt = st.text_area(
+                "Section Prompt",
+                value=st.session_state.get("windshield_prompt", DEFAULT_PROMPTS["windshield"]),
+                key="windshield_prompt",
+                height=100
+            )
+            if st.button("Generate Windshield Section"):
+                with st.spinner("Generating Windshield section..."):
+                    article_text = extract_article_text(windshield_urls)
+                    generated_text = generate_section_content("windshield", article_text, windshield_notes, windshield_prompt)
+                    st.success("Windshield section generated!")
                     st.write(generated_text)
-                    st.session_state.generated_sections[f"Rearview Mirror {i}"] = generated_text
+                    st.session_state.generated_sections["Windshield View"] = generated_text
 
-        # Dashboard Data Section
-        st.subheader("Dashboard Data")
-        dashboard_urls = st.text_input(
-            "Enter article URLs (separated by ';;')",
-            value=st.session_state.get("dashboard_urls", ""),
-            key="dashboard_urls"
-        )
-        dashboard_notes = st.text_area(
-            "Notes",
-            value=st.session_state.get("dashboard_notes", ""),
-            key="dashboard_notes",
-            height=100
-        )
-        dashboard_prompt = st.text_area(
-            "Section Prompt",
-            value=st.session_state.get("dashboard_prompt", DEFAULT_PROMPTS["dashboard"]),
-            key="dashboard_prompt",
-            height=100
-        )
-        if st.button("Generate Dashboard Section"):
-            with st.spinner("Generating Dashboard section..."):
-                article_text = extract_article_text(dashboard_urls)
-                generated_text = generate_section_content("dashboard", article_text, dashboard_notes, dashboard_prompt)
-                st.success("Dashboard section generated!")
-                st.write(generated_text)
-                st.session_state.generated_sections["Dashboard Data"] = generated_text
-
-        # The Next Lane Section
-        st.subheader("The Next Lane")
-        nextlane_urls = st.text_input(
-            "Enter article URLs (separated by ';;')",
-            value=st.session_state.get("nextlane_urls", ""),
-            key="nextlane_urls"
-        )
-        nextlane_notes = st.text_area(
-            "Notes",
-            value=st.session_state.get("nextlane_notes", ""),
-            key="nextlane_notes",
-            height=100
-        )
-        nextlane_prompt = st.text_area(
-            "Section Prompt",
-            value=st.session_state.get("nextlane_prompt", DEFAULT_PROMPTS["nextlane"]),
-            key="nextlane_prompt",
-            height=100
-        )
-        if st.button("Generate Next Lane Section"):
-            with st.spinner("Generating The Next Lane section..."):
-                article_text = extract_article_text(nextlane_urls)
-                generated_text = generate_section_content("nextlane", article_text, nextlane_notes, nextlane_prompt)
-                st.success("The Next Lane section generated!")
-                st.write(generated_text)
-                st.session_state.generated_sections["The Next Lane"] = generated_text
-
-        st.markdown("---")
-        # Assemble Newsletter Button using fixed order and placeholders
-        if st.button("Create Newsletter"):
-            with st.spinner("Assembling Newsletter..."):
-                sections_content = ""
-                # Fixed order: Windshield, Rearview stories, Dashboard, Next Lane
-                sections = []
-                sections.append(("Windshield View", st.session_state.generated_sections.get("Windshield View", "Not generated yet.")))
-                num_rearview = st.session_state.get("num_rearview", 3)
-                for i in range(1, int(num_rearview) + 1):
-                    sections.append((f"Rearview Mirror {i}", st.session_state.generated_sections.get(f"Rearview Mirror {i}", "Not generated yet.")))
-                sections.append(("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", "Not generated yet.")))
-                sections.append(("The Next Lane", st.session_state.generated_sections.get("The Next Lane", "Not generated yet.")))
-                for title, content in sections:
-                    sections_content += f"""
-                    <div class="section">
-                        <h2>{title}</h2>
-                        <p>{content}</p>
-                    </div>
-                    """
-                newsletter_html = generate_newsletter_html(sections_content, theme=theme)
-                st.success("Newsletter Created!")
-                components.html(newsletter_html, height=600, scrolling=True)
-                st.download_button(
-                    "Download Newsletter",
-                    data=newsletter_html,
-                    file_name=f"newsletter_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html",
-                    mime="text/html"
+            # Rearview Mirror Section (multiple stories)
+            st.subheader("Rearview Mirror (Multiple Stories)")
+            num_rearview = st.number_input(
+                "Number of Rearview Stories",
+                min_value=1,
+                max_value=5,
+                value=st.session_state.get("num_rearview", 3),
+                step=1,
+                key="num_rearview"
+            )
+            for i in range(1, int(num_rearview) + 1):
+                st.markdown(f"**Story {i}**")
+                story_urls = st.text_input(
+                    f"Story {i} URLs (separated by ';;')",
+                    value=st.session_state.get(f"rearview_urls_{i}", ""),
+                    key=f"rearview_urls_{i}"
                 )
+                story_notes = st.text_area(
+                    f"Story {i} Notes",
+                    value=st.session_state.get(f"rearview_notes_{i}", ""),
+                    key=f"rearview_notes_{i}",
+                    height=80
+                )
+                story_prompt = st.text_area(
+                    f"Story {i} Prompt",
+                    value=st.session_state.get(f"rearview_prompt_{i}", DEFAULT_PROMPTS["rearview"]),
+                    key=f"rearview_prompt_{i}",
+                    height=80
+                )
+                if st.button(f"Generate Rearview {i} Section"):
+                    with st.spinner(f"Generating Rearview {i} section..."):
+                        article_text = extract_article_text(st.session_state[f"rearview_urls_{i}"])
+                        generated_text = generate_section_content(
+                            "rearview",
+                            article_text,
+                            st.session_state[f"rearview_notes_{i}"],
+                            st.session_state[f"rearview_prompt_{i}"]
+                        )
+                        st.success(f"Rearview {i} section generated!")
+                        st.write(generated_text)
+                        st.session_state.generated_sections[f"Rearview Mirror {i}"] = generated_text
 
-    with right_panel:
-        st.header("Newsletter Summary")
-        st.markdown("This panel displays the generated sections in fixed order. If a section has not been generated yet, a placeholder is shown.")
-        def display_section(title, content):
-            st.markdown(f"### {title}")
-            st.write(content if content else "Not generated yet.")
+            # Dashboard Data Section
+            st.subheader("Dashboard Data")
+            dashboard_urls = st.text_input(
+                "Enter article URLs (separated by ';;')",
+                value=st.session_state.get("dashboard_urls", ""),
+                key="dashboard_urls"
+            )
+            dashboard_notes = st.text_area(
+                "Notes",
+                value=st.session_state.get("dashboard_notes", ""),
+                key="dashboard_notes",
+                height=100
+            )
+            dashboard_prompt = st.text_area(
+                "Section Prompt",
+                value=st.session_state.get("dashboard_prompt", DEFAULT_PROMPTS["dashboard"]),
+                key="dashboard_prompt",
+                height=100
+            )
+            if st.button("Generate Dashboard Section"):
+                with st.spinner("Generating Dashboard section..."):
+                    article_text = extract_article_text(dashboard_urls)
+                    generated_text = generate_section_content("dashboard", article_text, dashboard_notes, dashboard_prompt)
+                    st.success("Dashboard section generated!")
+                    st.write(generated_text)
+                    st.session_state.generated_sections["Dashboard Data"] = generated_text
 
-        display_section("Windshield View", st.session_state.generated_sections.get("Windshield View", ""))
-        num_rearview = st.session_state.get("num_rearview", 3)
-        for i in range(1, int(num_rearview) + 1):
-            display_section(f"Rearview Mirror {i}", st.session_state.generated_sections.get(f"Rearview Mirror {i}", ""))
-        display_section("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", ""))
-        display_section("The Next Lane", st.session_state.generated_sections.get("The Next Lane", ""))
+            # The Next Lane Section
+            st.subheader("The Next Lane")
+            nextlane_urls = st.text_input(
+                "Enter article URLs (separated by ';;')",
+                value=st.session_state.get("nextlane_urls", ""),
+                key="nextlane_urls"
+            )
+            nextlane_notes = st.text_area(
+                "Notes",
+                value=st.session_state.get("nextlane_notes", ""),
+                key="nextlane_notes",
+                height=100
+            )
+            nextlane_prompt = st.text_area(
+                "Section Prompt",
+                value=st.session_state.get("nextlane_prompt", DEFAULT_PROMPTS["nextlane"]),
+                key="nextlane_prompt",
+                height=100
+            )
+            if st.button("Generate Next Lane Section"):
+                with st.spinner("Generating The Next Lane section..."):
+                    article_text = extract_article_text(nextlane_urls)
+                    generated_text = generate_section_content("nextlane", article_text, nextlane_notes, nextlane_prompt)
+                    st.success("The Next Lane section generated!")
+                    st.write(generated_text)
+                    st.session_state.generated_sections["The Next Lane"] = generated_text
+
+            st.markdown("---")
+            # Assemble Newsletter Button using fixed order and placeholders
+            if st.button("Create Newsletter"):
+                with st.spinner("Assembling Newsletter..."):
+                    sections_content = ""
+                    # Fixed order: Windshield, Rearview stories, Dashboard, Next Lane
+                    sections = []
+                    sections.append(("Windshield View", st.session_state.generated_sections.get("Windshield View", "Not generated yet.")))
+                    num_rearview = st.session_state.get("num_rearview", 3)
+                    for i in range(1, int(num_rearview) + 1):
+                        sections.append((f"Rearview Mirror {i}", st.session_state.generated_sections.get(f"Rearview Mirror {i}", "Not generated yet.")))
+                    sections.append(("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", "Not generated yet.")))
+                    sections.append(("The Next Lane", st.session_state.generated_sections.get("The Next Lane", "Not generated yet.")))
+                    for title, content in sections:
+                        sections_content += f"""
+                        <div class="section">
+                            <h2>{title}</h2>
+                            <p>{content}</p>
+                        </div>
+                        """
+                    newsletter_html = generate_newsletter_html(sections_content, theme=theme)
+                    st.success("Newsletter Created!")
+                    components.html(newsletter_html, height=600, scrolling=True)
+                    st.download_button(
+                        "Download Newsletter",
+                        data=newsletter_html,
+                        file_name=f"newsletter_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html",
+                        mime="text/html"
+                    )
+
+        with right_panel:
+            st.header("Newsletter Summary")
+            st.markdown("This panel displays the generated sections in fixed order. If a section has not been generated yet, a placeholder is shown.")
+            def display_section(title, content):
+                st.markdown(f"### {title}")
+                st.write(content if content else "Not generated yet.")
+
+            display_section("Windshield View", st.session_state.generated_sections.get("Windshield View", ""))
+            num_rearview = st.session_state.get("num_rearview", 3)
+            for i in range(1, int(num_rearview) + 1):
+                display_section(f"Rearview Mirror {i}", st.session_state.generated_sections.get(f"Rearview Mirror {i}", ""))
+            display_section("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", ""))
+            display_section("The Next Lane", st.session_state.generated_sections.get("The Next Lane", ""))
+    
+    elif section == "Discover News":
+        render_news_discovery()
+        # Optionally display selected articles for debugging
+        st.write("Selected Articles:", st.session_state.get("discovered_articles", []))
 
 if __name__ == "__main__":
     main()
