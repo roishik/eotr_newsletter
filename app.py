@@ -33,6 +33,7 @@ DEFAULT_PROMPTS = {
         "Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging. "
         "Don't be too optimistic and avoid make announcements that are bigger than the actual news."
         "If possible - try to lead the reader with an intresting story, about a person or a company, that will make the reader want to read more about the subject."
+        "Write in first-person singular."
         "\nLenght\n"
         "Keep the response concise and focused on the key points."
         "\nWhat to write about?\n"
