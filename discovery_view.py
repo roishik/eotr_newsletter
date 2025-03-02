@@ -31,7 +31,14 @@ def render_news_discovery():
     if timeframe == "Last Week":
         from_date = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
     else:  # "Last Month"
-        from_date = (datetime.utcnow() - timedelta(days=30)).strftime("%Y-%m-%d")
+        # Calculate 30 days ago
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        # Get the first day of last month
+        today = datetime.utcnow()
+        first_day_of_last_month = today.replace(day=1) - timedelta(days=1)
+        first_day_of_last_month = first_day_of_last_month.replace(day=1)
+        # Take the maximum of the two dates (due to plan limitations)
+        from_date = max(thirty_days_ago, first_day_of_last_month).strftime("%Y-%m-%d")
 
     to_date = datetime.utcnow().strftime("%Y-%m-%d")
 
