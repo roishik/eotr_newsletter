@@ -1,0 +1,88 @@
+/* Base app styling */
+.stApp {
+    /* Use a subtle gradient background in light mode */
+    background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+}
+
+/* Custom styling for headers */
+h1, h2, h3 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2e6c80;
+    letter-spacing: 0.5px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #5F9EA0;
+    padding-bottom: 0.5rem;
+}
+
+/* Card-like containers for sections */
+.stTextInput, .stTextArea, .stButton, .stSelectbox {
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+/* Custom button styling */
+.stButton > button {
+    background-color: #5F9EA0;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    background-color: #4F8E90;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+}
+
+/* Dark mode styling */
+[data-theme="dark"] .stApp {
+    background: linear-gradient(to bottom right, #2C3333, #1A1A1A);
+}
+
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 {
+    color: #8ab4f8;
+}
+
+[data-theme="dark"] .stButton > button {
+    background-color: #5F9EA0;
+    color: white;
+}
+
+/* Section separators */
+.section-divider {
+    height: 3px;
+    background: linear-gradient(to right, #5F9EA0, transparent);
+    margin: 20px 0;
+    border-radius: 2px;
+}
+
+/* Success message styling */
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px 15px;
+    border-radius: 4px;
+    border-left: 4px solid #28a745;
+    margin: 10px 0;
+}
+
+/* Error message styling */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 15px;
+    border-radius: 4px;
+    border-left: 4px solid #dc3545;
+    margin: 10px 0;
+}
