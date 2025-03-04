@@ -12,6 +12,27 @@ from discovery_view import render_news_discovery
 
 st.set_page_config(page_title="Mobileye Newsletter Generator", layout="wide")
 
+def card(title, content, key=None):
+    """Create a card-like container with a title and content"""
+    st.markdown(f"""
+    <div style="
+        background-color: {'#3c4043' if st.session_state.get('theme', 'Light') == 'Dark' else 'white'};
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    ">
+        <h3 style="
+            color: {'#8ab4f8' if st.session_state.get('theme', 'Light') == 'Dark' else '#2e6c80'};
+            margin-top: 0;
+            font-size: 1.2rem;
+            border-bottom: 1px solid {'#5f6368' if st.session_state.get('theme', 'Light') == 'Dark' else '#e6e6e6'};
+            padding-bottom: 8px;
+        ">{title}</h3>
+        {content}
+    </div>
+    """, unsafe_allow_html=True)
+
 # Initialize LLM service
 llm_service = LLMService()
 
