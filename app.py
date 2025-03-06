@@ -269,6 +269,7 @@ def extract_article_text(urls):
     return combined_text.strip()
 
 def generate_section_content(section_key, article_text, notes, section_prompt):
+    loading_animation()
     """Generates content using the selected model through LLM service."""
     user_content = (
         f"{section_prompt}\n\nCombined Article Content:\n{article_text}\n\nNotes: {notes if notes else ''}"
@@ -286,34 +287,65 @@ def generate_section_content(section_key, article_text, notes, section_prompt):
         return ""
 
 def generate_newsletter_html(sections_content, theme="light"):
+    loading_animation()
     if theme.lower() == "dark":
         style = """
         <style>
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                margin: 40px;
+                margin: 0;
+                padding: 0;
                 background-color: #303134;
                 color: #e8eaed;
+                line-height: 1.6;
             }
             .container {
                 max-width: 800px;
-                margin: auto;
+                margin: 0 auto;
                 background-color: #3c4043;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                border-radius: 12px;
+                overflow: hidden;
             }
-            h1 {
+            .header {
+                background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+                color: white;
+                padding: 30px;
                 text-align: center;
-                color: #8ab4f8;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 28px;
+                letter-spacing: 1px;
+            }
+            .header p {
+                margin: 10px 0 0;
+                opacity: 0.8;
+            }
+            .content {
+                padding: 30px;
             }
             .section {
-                margin-bottom: 30px;
-                padding-bottom: 20px;
+                margin-bottom: 40px;
                 border-bottom: 1px solid #5f6368;
+                padding-bottom: 20px;
+            }
+            .section:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
             }
             .section h2 {
                 color: #8ab4f8;
+                font-size: 22px;
+                margin-top: 0;
+                margin-bottom: 15px;
+            }
+            .footer {
+                background-color: #292b2f;
+                padding: 20px;
+                text-align: center;
+                font-size: 14px;
+                color: #9aa0a6;
             }
         </style>
         """
@@ -322,29 +354,59 @@ def generate_newsletter_html(sections_content, theme="light"):
         <style>
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                margin: 40px;
+                margin: 0;
+                padding: 0;
                 background-color: #f4f4f9;
                 color: #333;
+                line-height: 1.6;
             }
             .container {
                 max-width: 800px;
-                margin: auto;
+                margin: 0 auto;
                 background-color: #fff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                border-radius: 12px;
+                overflow: hidden;
             }
-            h1 {
+            .header {
+                background: linear-gradient(135deg, #5F9EA0, #7FB3D5);
+                color: white;
+                padding: 30px;
                 text-align: center;
-                color: #2e6c80;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 28px;
+                letter-spacing: 1px;
+            }
+            .header p {
+                margin: 10px 0 0;
+                opacity: 0.8;
+            }
+            .content {
+                padding: 30px;
             }
             .section {
-                margin-bottom: 30px;
+                margin-bottom: 40px;
+                border-bottom: 1px solid #eee;
                 padding-bottom: 20px;
-                border-bottom: 1px solid #ddd;
+            }
+            .section:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
             }
             .section h2 {
                 color: #2e6c80;
+                font-size: 22px;
+                margin-top: 0;
+                margin-bottom: 15px;
+            }
+            .footer {
+                background-color: #f9f9f9;
+                padding: 20px;
+                text-align: center;
+                font-size: 14px;
+                color: #777;
             }
         </style>
         """
@@ -357,8 +419,16 @@ def generate_newsletter_html(sections_content, theme="light"):
     </head>
     <body>
         <div class="container">
-            <h1>Mobileye Newsletter</h1>
-            {sections_content}
+            <div class="header">
+                <h1>Mobileye Newsletter</h1>
+                <p>Insights from the world of autonomous vehicles & AI</p>
+            </div>
+            <div class="content">
+                {sections_content}
+            </div>
+            <div class="footer">
+                <p>© {datetime.datetime.now().year} Mobileye • Generated on {datetime.datetime.now().strftime("%B %d, %Y")}</p>
+            </div>
         </div>
     </body>
     </html>

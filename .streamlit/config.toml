@@ -1,0 +1,9 @@
+[theme]
+primaryColor="#5F9EA0"  # Mobileye-inspired bluish teal
+backgroundColor="#F0F2F6"
+secondaryBackgroundColor="#E6F0F2"
+textColor="#262730"
+font="sans serif"
+
+[server]
+enableStaticServing = true
