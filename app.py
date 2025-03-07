@@ -247,7 +247,7 @@ def load_draft(filename):
             st.session_state[key] = value
 
     st.sidebar.success("Draft loaded!")
-    st.experimental_rerun()
+    st.rerun()
 
 # ----------------------------------------------------------------
 # Functions for newsletter generation
@@ -570,7 +570,6 @@ def main():
                     article_text = extract_article_text(windshield_urls)
                     generated_text = generate_section_content("windshield", article_text, windshield_notes, windshield_prompt)
                     st.success("Windshield section generated!")
-                    st.write(generated_text)
                     st.session_state.generated_sections["Windshield View"] = generated_text
 
             # Rearview Mirror Section (multiple stories)
@@ -607,7 +606,6 @@ def main():
                         article_text = extract_article_text(st.session_state[f"rearview_urls_{i}"])
                         generated_text = generate_section_content("rearview", article_text, st.session_state[f"rearview_notes_{i}"], st.session_state[f"rearview_prompt_{i}"])
                         st.success(f"Rearview {i} section generated!")
-                        st.write(generated_text)
                         st.session_state.generated_sections[f"Rearview Mirror {i}"] = generated_text
 
             # Dashboard Data Section
@@ -634,7 +632,6 @@ def main():
                     article_text = extract_article_text(dashboard_urls)
                     generated_text = generate_section_content("dashboard", article_text, dashboard_notes, dashboard_prompt)
                     st.success("Dashboard section generated!")
-                    st.write(generated_text)
                     st.session_state.generated_sections["Dashboard Data"] = generated_text
 
             # The Next Lane Section
@@ -661,7 +658,6 @@ def main():
                     article_text = extract_article_text(nextlane_urls)
                     generated_text = generate_section_content("nextlane", article_text, nextlane_notes, nextlane_prompt)
                     st.success("The Next Lane section generated!")
-                    st.write(generated_text)
                     st.session_state.generated_sections["The Next Lane"] = generated_text
 
             st.markdown("---")
