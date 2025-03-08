@@ -113,6 +113,7 @@ def show_completion_status():
     else:
         color = "#28a745"  # Green
     
+    # Display the progress bar
     st.markdown(f"""
     <div style="margin: 20px 0;">
         <h4 style="margin-bottom: 5px;">Newsletter Completion: {completion_percentage}%</h4>
@@ -130,14 +131,24 @@ def show_completion_status():
                 transition: width 0.5s ease;
             "></div>
         </div>
+    """, unsafe_allow_html=True)
+    
+    # Horizontal layout for section status
+    section_count = len(sections)
+    section_width = 100 / section_count  # Calculate width percentage for each section
+    
+    # Start horizontal container with flex display
+    st.markdown(f"""
         <div style="
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: space-between;
             margin-top: 10px;
-            gap: 8px;
+            width: 100%;
         ">
     """, unsafe_allow_html=True)
     
+    # Add each section horizontally
     for section in sections:
         is_complete = section in st.session_state.get("generated_sections", {})
         status_color = "#28a745" if is_complete else "#6c757d"
@@ -147,17 +158,23 @@ def show_completion_status():
         <div style="
             background-color: {status_color}22;
             color: {status_color};
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 4px;
             font-size: 0.8rem;
-            display: inline-block;
+            text-align: center;
+            flex: 1;
+            margin: 0 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         ">
             {status_icon} {section}
         </div>
         """, unsafe_allow_html=True)
     
+    # Close containers
     st.markdown("</div></div>", unsafe_allow_html=True)
-
+    
 # ----------------------------------------------------------------
 # Initialize LLM service
 llm_service = LLMService()
