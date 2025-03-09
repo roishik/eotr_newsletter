@@ -133,48 +133,20 @@ def show_completion_status():
         </div>
     """, unsafe_allow_html=True)
     
-    # Horizontal layout for section status
-    section_count = len(sections)
-    section_width = 100 / section_count  # Calculate width percentage for each section
+    # Create horizontal layout using Streamlit columns
+    cols = st.columns(len(sections))
     
-    # Start horizontal container with flex display
-    st.markdown(f"""
-        <div style="
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            margin-top: 10px;
-            width: 100%;
-        ">
-    """, unsafe_allow_html=True)
+    for i, (col, section) in enumerate(zip(cols, sections)):
+        with col:
+            is_complete = section in st.session_state.get("generated_sections", {})
+            if is_complete:
+                st.markdown(f"✅ {section}")
+            else:
+                st.markdown(f"⭕ {section}")
     
-    # Add each section horizontally
-    for section in sections:
-        is_complete = section in st.session_state.get("generated_sections", {})
-        status_color = "#28a745" if is_complete else "#6c757d"
-        status_icon = "✓" if is_complete else "○"
-        
-        st.markdown(f"""
-        <div style="
-            background-color: {status_color}22;
-            color: {status_color};
-            padding: 5px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            text-align: center;
-            flex: 1;
-            margin: 0 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        ">
-            {status_icon} {section}
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Close containers
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    
+    # Close the div for the progress bar
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # ----------------------------------------------------------------
 # Initialize LLM service
 llm_service = LLMService()
