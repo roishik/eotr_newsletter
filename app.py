@@ -9,6 +9,7 @@ import os
 import json
 import streamlit.components.v1 as components
 from discovery_view import render_news_discovery
+from datetime import datetime
 
 # Custom Design Imports
 import base64
@@ -521,6 +522,18 @@ def main():
     # Section selection
     section = st.sidebar.radio("Choose Section", ["Newsletter", "Discover News"])
 
+    # Initialize session state variables
+    if "app_mode" not in st.session_state:
+        st.session_state.app_mode = "generation"  # Options: "generation", "edit"
+    if "edited_sections" not in st.session_state:
+        st.session_state.edited_sections = {}
+
+    # In your sidebar
+    with st.sidebar:
+        if st.button("Final Edit Mode" if st.session_state.app_mode == "generation" else "Return to Generation Mode"):
+            st.session_state.app_mode = "edit" if st.session_state.app_mode == "generation" else "generation"
+            st.rerun()
+
     if section == "Newsletter":
         # Two-column layout
         main_panel, right_panel = st.columns([1, 2])
@@ -690,9 +703,112 @@ def main():
                 display_section(f"Rearview Mirror {i}", st.session_state.generated_sections.get(f"Rearview Mirror {i}", ""))
             display_section("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", ""))
             display_section("The Next Lane", st.session_state.generated_sections.get("The Next Lane", ""))
+
+            if st.session_state.app_mode == "generation":
+                # Your existing generation UI code stays here
+                pass
+            else:
+                # Display edit mode
+                display_edit_mode()
     
     elif section == "Discover News":
         render_news_discovery()
+
+def display_edit_mode():
+    st.header("Newsletter Edit Mode")
+    
+    # Check if there are any generated sections
+    if not st.session_state.get("generated_sections"):
+        st.warning("No content has been generated yet. Please generate content for at least one section first.")
+        return
+    else:
+        sections = list(st.session_state.get("generated_sections", {}).keys())
+    
+    # Create tabs for each section
+    section_tabs = st.tabs([f"{section}" for section in sections if section in st.session_state.get("generated_sections", {})])
+    
+    for i, section in enumerate([s for s in sections if s in st.session_state.get("generated_sections", {})]):
+        with section_tabs[i]:
+            col1, col2 = st.columns([1, 1])
+            
+            with col1:
+                st.subheader("Original Content")
+                # Get original content or edited content if it exists
+                original_content = st.session_state.generated_sections[section]
+                edited_content = st.session_state.edited_sections.get(section, original_content)
+                
+                # Display editable text area with current content
+                edited_text = st.text_area(
+                    "Edit content directly:",
+                    value=edited_content,
+                    height=300,
+                    key=f"edit_area_{section}"
+                )
+                
+                # Edit prompt input
+                edit_prompt = st.text_input(
+                    "Provide instructions to edit this section:", 
+                    placeholder="e.g., Make it shorter, Change the tone to be more formal",
+                    key=f"edit_prompt_{section}"
+                )
+                
+                # Apply edits button
+                if st.button("Apply AI Edit", key=f"edit_button_{section}"):
+                    if edit_prompt:
+                        with st.spinner(f"Editing {section}..."):
+                            # Construct prompt for editing
+                            full_prompt = f"""
+                            Edit the following content according to these instructions: {edit_prompt}
+                            
+                            CONTENT TO EDIT:
+                            {original_content}
+                            """
+                            # Call LLM service to edit the content
+                            edited_content = llm_service.generate_content(full_prompt)
+                            st.session_state.edited_sections[section] = edited_content
+                            st.rerun()
+                    else:
+                        # If no prompt but button clicked, just save the manually edited text
+                        st.session_state.edited_sections[section] = edited_text
+                        st.success("Manual edits saved.")
+            
+            with col2:
+                st.subheader("Final Result")
+                # Display the edited content
+                current_content = st.session_state.edited_sections.get(section, original_content)
+                st.markdown(current_content)
+
+    # Add a tab for the complete newsletter
+    with st.expander("View Complete Newsletter", expanded=True):
+        st.subheader("Complete Newsletter")
+        for section in sections:
+            if section in st.session_state.get("generated_sections", {}):
+                st.markdown(f"## {section}")
+                content = st.session_state.edited_sections.get(section, st.session_state.generated_sections.get(section, ""))
+                st.markdown(content)
+                st.divider()
+        
+        # Export options
+        if st.button("Export Newsletter"):
+            export_newsletter()
+
+def export_newsletter():
+    """Export the complete newsletter to a file"""
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"drafts/newsletter_export_{now}.md"
+    
+    # Get sections from session state
+    sections = list(st.session_state.get("generated_sections", {}).keys())
+
+    with open(filename, "w") as f:
+        for section in sections:
+            if section in st.session_state.get("generated_sections", {}):
+                f.write(f"## {section}\n\n")
+                content = st.session_state.edited_sections.get(section, st.session_state.generated_sections.get(section, ""))
+                f.write(f"{content}\n\n")
+                f.write("---\n\n")
+    
+    st.success(f"Newsletter exported to {filename}")
 
 if __name__ == "__main__":
     main()
