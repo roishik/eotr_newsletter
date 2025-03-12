@@ -6,8 +6,6 @@ An AI-powered application for creating professional, customized newsletters for 
 
 The Mobileye Newsletter Generator is a Streamlit-based application that helps content creators quickly produce well-structured company newsletters. It leverages large language models (LLMs) to generate content based on provided articles, URLs, and user instructions. The application supports multiple content sections, draft saving/loading, and an AI-assisted editing mode.
 
-![App Banner](https://placeholder-image.com/newsletter-generator-banner.jpg)
-
 ## Features
 
 ### Content Generation
