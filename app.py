@@ -817,8 +817,18 @@ def main():
                     if edited_text:
                         st.write(edited_text)
                         if st.button("Keep this edit"):
+                            # Update the generated_sections with the edited version
                             st.session_state.generated_sections[selected_section] = edited_text
+                            
+                            # Clear the edited version from edited_sections since it's now the official version
+                            # This ensures the manual edit field will show the updated content
+                            if selected_section in st.session_state.edited_sections:
+                                del st.session_state.edited_sections[selected_section]
+                                
                             st.success(f"Updated {selected_section} with edited version!")
+                            
+                            # Force a rerun to refresh the UI with updated content
+                            st.rerun()
                     else:
                         st.info("No edits applied yet.")
                 
