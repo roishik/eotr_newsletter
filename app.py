@@ -177,6 +177,7 @@ def save_draft():
         "edited_sections": st.session_state.get("edited_sections", {}),
         "selected_provider": st.session_state.get("selected_provider", "OpenAI"),
         "selected_model": st.session_state.get("selected_model", "gpt-4o"),
+        "language": st.session_state.get("language", "English"),  # Save language preference
     }
     for i in range(1, 6):
         draft_data[f"rearview_urls_{i}"] = st.session_state.get(f"rearview_urls_{i}", "")
@@ -193,15 +194,16 @@ def load_draft(filename):
     with open(f"drafts/{filename}", "r") as f:
         draft_data = json.load(f)
     
-    # Save the loaded provider and model separately for display
+    # Save the loaded provider, model, and language separately for display
     st.session_state["loaded_provider"] = draft_data.get("selected_provider", "Unknown")
     st.session_state["loaded_model"] = draft_data.get("selected_model", "Unknown")
+    st.session_state["language"] = draft_data.get("language", "English")  # Set language from draft
 
     for key, value in draft_data.items():
         if key not in ["selected_provider", "selected_model"]:  # don't update provider/model due to Streamlit limitation
             st.session_state[key] = value
 
-    st.sidebar.success("Draft loaded!")
+    st.sidebar.success(f"Draft loaded! Language: {st.session_state['language']}")
     st.rerun()
 
 # ----------------------------------------------------------------
@@ -229,11 +231,19 @@ def generate_section_content(section_key, article_text, notes, section_prompt):
     user_content = (
         f"{section_prompt}\n\nCombined Article Content:\n{article_text}\n\nNotes: {notes if notes else ''}"
     )
+    
+    # Select the appropriate overall prompt based on language
+    selected_language = st.session_state.get("language", "English")
+    if selected_language == "Hebrew":
+        system_prompt = DEFAULT_PROMPTS["overall_hebrew"]
+    else:
+        system_prompt = DEFAULT_PROMPTS["overall"]
+    
     try:
         generated_text = llm_service.generate_content(
             provider=st.session_state.get("selected_provider", "OpenAI"),
             model=st.session_state.get("selected_model", "gpt-4o"),
-            system_prompt=DEFAULT_PROMPTS["overall"],
+            system_prompt=system_prompt,
             user_prompt=user_content
         )
         return generated_text
@@ -260,8 +270,20 @@ def edit_section_content(section_key, original_text, edit_prompt):
         st.error(str(e))
         return ""
 
-def generate_newsletter_html(sections_content, theme="light"):
+def generate_newsletter_html(sections_content, theme="light", language="English"):
     loading_animation()
+    
+    # Determine text direction based on language
+    dir_attr = 'rtl' if language == "Hebrew" else 'ltr'
+    lang_attr = 'he' if language == "Hebrew" else 'en'
+    
+    # Add body direction and language attributes
+    body_attrs = f'dir="{dir_attr}" lang="{lang_attr}"'
+    
+    # Adjust header text based on language
+    header_title = "Mobileye Newsletter" if language == "English" else "ניוזלטר מובילאיי"
+    header_subtitle = "Insights from the world of autonomous vehicles & AI" if language == "English" else "תובנות מעולם הרכב האוטונומי והבינה המלאכותית"
+    
     if theme.lower() == "dark":
         style = """
         <style>
@@ -384,24 +406,35 @@ def generate_newsletter_html(sections_content, theme="light"):
             }
         </style>
         """
+    
+    # Footer text based on language
+    footer_text = f"© {datetime.datetime.now().year} Mobileye • Generated on {datetime.datetime.now().strftime('%B %d, %Y')}"
+    if language == "Hebrew":
+        # Format the date in Hebrew style
+        today = datetime.datetime.now()
+        months_he = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"]
+        month_he = months_he[today.month - 1]
+        footer_text = f"© {today.year} מובילאיי • נוצר בתאריך {today.day} ב{month_he} {today.year}"
+    
     html_template = f"""
     <!DOCTYPE html>
-    <html>
+    <html lang="{lang_attr}">
     <head>
-        <title>Mobileye Newsletter</title>
+        <meta charset="UTF-8">
+        <title>{header_title}</title>
         {style}
     </head>
-    <body>
+    <body {body_attrs}>
         <div class="container">
             <div class="header">
-                <h1>Mobileye Newsletter</h1>
-                <p>Insights from the world of autonomous vehicles & AI</p>
+                <h1>{header_title}</h1>
+                <p>{header_subtitle}</p>
             </div>
             <div class="content">
                 {sections_content}
             </div>
             <div class="footer">
-                <p>© {datetime.datetime.now().year} Mobileye • Generated on {datetime.datetime.now().strftime("%B %d, %Y")}</p>
+                <p>{footer_text}</p>
             </div>
         </div>
     </body>
@@ -670,7 +703,7 @@ def main():
                                 <p>{content}</p>
                             </div>
                             """
-                        newsletter_html = generate_newsletter_html(sections_content, theme=theme)
+                        newsletter_html = generate_newsletter_html(sections_content, theme=theme, language=st.session_state.get('language', 'English'))
                         st.success("Newsletter Created!")
                         components.html(newsletter_html, height=600, scrolling=True)
                         st.download_button(
@@ -681,6 +714,11 @@ def main():
                         )
             with right_panel:
                 st.header("Newsletter Summary")
+                # Display language selection
+                selected_language = st.session_state.get("language", "English")
+                language_indicator = "🇺🇸 English" if selected_language == "English" else "🇮🇱 עברית"
+                st.info(f"Selected Language: {language_indicator}", icon="🌐")
+                
                 # Display completion status at the top
                 show_completion_status()
                 st.markdown("This panel displays the generated sections in fixed order. If a section has not been generated yet, a placeholder is shown.")
@@ -693,12 +731,6 @@ def main():
                 display_section("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", ""))
                 display_section("The Next Lane", st.session_state.generated_sections.get("The Next Lane", ""))
                 
-                # Add button to switch to edit mode
-                st.markdown("---")
-                if st.button("Switch to Edit Mode"):
-                    st.session_state.edit_mode = True
-                    st.rerun()
-        
         else:
             # Edit Mode
             st.header("Newsletter Edit Mode")
@@ -824,7 +856,7 @@ def main():
                             </div>
                             """
                         
-                        newsletter_html = generate_newsletter_html(sections_content, theme=theme)
+                        newsletter_html = generate_newsletter_html(sections_content, theme=theme, language=st.session_state.get('language', 'English'))
                         st.success("Final Newsletter Created!")
                         components.html(newsletter_html, height=600, scrolling=True)
                         st.download_button(
