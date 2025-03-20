@@ -3,6 +3,8 @@ import openai
 import anthropic
 from dataclasses import dataclass
 from typing import Dict, List, Optional
+import google.generativeai as genai
+
 
 @dataclass
 class ModelConfig:
@@ -26,6 +28,10 @@ class LLMService:
                 "claude-3-7-sonnet-latest": ModelConfig("Claude 3.7 Sonnet"),
                 "claude-3-haiku-20240307": ModelConfig("Claude 3 Opus"),
                 "claude-3-5-haiku-latest": ModelConfig("Claude 3 Haiku")
+            },
+            "Google": {
+                "gemini-1.5-pro": ModelConfig("Gemini 1.5 Pro"),
+                "gemini-1.5-flash": ModelConfig("Gemini 1.5 Flash")
             }
         }
 
@@ -90,3 +96,23 @@ class LLMService:
             ]
         )
         return response.content[0].text.strip()
+    
+    def _generate_gemini(self, model: str, system_prompt: str, user_prompt: str) -> str:
+        """Generates content using Google's Gemini API."""
+        # Get the Gemini model
+        gemini_model = genai.GenerativeModel(
+            model_name=model,
+            generation_config={
+                "temperature": self.MODELS["Google"][model].temperature,
+                "max_output_tokens": self.MODELS["Google"][model].max_tokens,
+            }
+        )
+        
+        # Gemini handles system prompts differently than OpenAI and Anthropic
+        # We'll prepend it to the user prompt for consistency
+        combined_prompt = f"{system_prompt}\n\n{user_prompt}"
+        
+        # Generate the response
+        response = gemini_model.generate_content(combined_prompt)
+        
+        return response.text.strip()

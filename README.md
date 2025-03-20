@@ -16,7 +16,7 @@ The Mobileye Newsletter Generator is a Streamlit-based application that helps co
   - The Next Lane: Competitor and industry future insights
 
 ### AI-Powered Content Creation
-- Support for multiple AI providers (OpenAI, Anthropic)
+- Support for multiple AI providers (OpenAI, Anthropic, Google Gemini)
 - Model selection for optimal content quality
 - Customizable prompts for each section
 
@@ -42,7 +42,7 @@ The Mobileye Newsletter Generator is a Streamlit-based application that helps co
 
 ### Prerequisites
 - Python 3.7+
-- API keys for supported LLM providers (OpenAI, Anthropic)
+- API keys for supported LLM providers (OpenAI, Anthropic, Google Gemini)
 - NewsAPI key for the news discovery feature
 
 ### Installation
@@ -62,6 +62,7 @@ pip install -r requirements.txt
 ```bash
 export OPENAI_API_KEY="your-openai-key"
 export ANTHROPIC_API_KEY="your-anthropic-key"
+export GOOGLE_API_KEY="your-google-key"
 export NEWSAPI_API_KEY="your-newsapi-key"
 ```
 
