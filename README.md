@@ -4,7 +4,7 @@ An AI-powered application for creating professional, customized newsletters for 
 
 ## Overview
 
-The Mobileye Newsletter Generator is a Streamlit-based application that helps content creators quickly produce well-structured company newsletters. It leverages large language models (LLMs) to generate content based on provided articles, URLs, and user instructions. The application supports multiple content sections, draft saving/loading, and an AI-assisted editing mode.
+The Mobileye Newsletter Generator is a Streamlit-based application that helps content creators quickly produce well-structured company newsletters. It leverages large language models (LLMs) to generate content based on provided articles, URLs, and user instructions. The application supports multiple content sections, draft saving/loading, an AI-assisted editing mode, and multilingual output.
 
 ## Features
 
@@ -19,6 +19,7 @@ The Mobileye Newsletter Generator is a Streamlit-based application that helps co
 - Support for multiple AI providers (OpenAI, Anthropic, Google Gemini)
 - Model selection for optimal content quality
 - Customizable prompts for each section
+- **Multilingual Support**: Generate newsletters in English or Hebrew
 
 ### Editing Mode
 - Three-panel interface for content refinement:
@@ -33,6 +34,7 @@ The Mobileye Newsletter Generator is a Streamlit-based application that helps co
 
 ### User Experience
 - Light and dark theme support
+- Language toggle (English/Hebrew)
 - Responsive design
 - Draft saving and loading
 - Progress tracking for newsletter completion
@@ -80,13 +82,14 @@ The application will be accessible at `http://localhost:8501` in your browser.
 ### Generate Mode
 
 1. **Select Provider and Model**: Choose your preferred AI service and model in the sidebar.
-2. **Fill in Content Sources**:
+2. **Choose Theme and Language**: Select between Light/Dark themes and English/Hebrew languages.
+3. **Fill in Content Sources**:
    - Enter article URLs (separated by `;;`)
    - Add notes to guide the AI
    - Customize section prompts if needed
-3. **Generate Sections**: Click the "Generate" button for each section.
-4. **Review Content**: Check the generated content in the right panel.
-5. **Create Newsletter**: Click "Create Newsletter" to compile all sections.
+4. **Generate Sections**: Click the "Generate" button for each section.
+5. **Review Content**: Check the generated content in the right panel.
+6. **Create Newsletter**: Click "Create Newsletter" to compile all sections.
 
 ### Edit Mode
 
@@ -105,6 +108,15 @@ The application will be accessible at `http://localhost:8501` in your browser.
 3. **Browse Results**: View and filter search results.
 4. **Save Articles**: Mark interesting articles to use in your newsletter.
 
+## Language Support
+
+The application supports generating content in both English and Hebrew:
+
+- **Language Selection**: Use the radio button in the sidebar to switch between languages.
+- **Right-to-Left Support**: Hebrew content is automatically displayed with RTL text direction.
+- **Localized UI Elements**: Headers, footers, and dates are displayed in the selected language.
+- **Saved Language Preference**: Your language choice is saved with drafts.
+
 ## Saving and Loading Drafts
 
 - **Save Draft**: Click "Save Draft" in the sidebar to store your current work.
@@ -114,7 +126,7 @@ The application will be accessible at `http://localhost:8501` in your browser.
 
 ### Default Prompts
 
-You can modify the default prompts in the `DEFAULT_PROMPTS` dictionary in `app.py` to better fit your organization's tone and style requirements.
+You can modify the default prompts in the `DEFAULT_PROMPTS` dictionary in `prompts.py` to better fit your organization's tone and style requirements. Language-specific prompts are available for multilingual support.
 
 ### Styling
 
@@ -128,6 +140,7 @@ mobileye-newsletter-generator/
 ├── llm_service.py         # LLM provider integration
 ├── news_service.py        # NewsAPI integration
 ├── discovery_view.py      # News discovery interface
+├── prompts.py             # Default prompts including language variants
 ├── design/
 │   └── styling.css        # Custom CSS styles
 ├── drafts/                # Saved newsletter drafts
