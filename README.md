@@ -1,3 +1,30 @@
+# Refactoring plan
+
+mobileye-newsletter/
+├── app.py                    # Main entry point (simplified)
+├── config/                   # Configuration files
+│   ├── __init__.py
+│   ├── settings.py           # Global app settings
+│   └── prompts.py            # Existing prompts file
+├── services/                 # Service layer
+│   ├── __init__.py
+│   ├── llm_service.py        # Existing LLM service
+│   └── news_service.py       # Existing news service
+├── ui/                       # UI components
+│   ├── __init__.py
+│   ├── components.py         # Reusable UI components
+│   ├── styles.py             # CSS styles
+│   ├── generate_view.py      # Generate content view
+│   ├── edit_view.py          # Edit content view
+│   └── discovery_view.py     # Existing discovery view
+├── utils/                    # Utility functions
+│   ├── __init__.py
+│   ├── content_utils.py      # Content manipulation functions
+│   └── file_utils.py         # File operations (save/load)
+└── models/                   # Data models
+    ├── __init__.py
+    └── newsletter.py         # Newsletter data structure
+
 # Mobileye Newsletter Generator
 
 An AI-powered application for creating professional, customized newsletters for Mobileye with a focus on autonomous vehicles, automotive industry news, and AI developments.
