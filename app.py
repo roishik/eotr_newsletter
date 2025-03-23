@@ -496,6 +496,11 @@ def main():
     theme = st.sidebar.radio("Select Theme", options=["Light", "Dark"], index=0)
     st.session_state['theme'] = theme
 
+    # Add language toggle
+    language = st.sidebar.radio("Select Language", options=["English", "Hebrew"], index=0)
+    st.session_state['language'] = language
+
+    
     if theme == "Dark":
         st.markdown(
             """
@@ -730,7 +735,7 @@ def main():
                     display_section(f"Rearview Mirror {i}", st.session_state.generated_sections.get(f"Rearview Mirror {i}", ""))
                 display_section("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", ""))
                 display_section("The Next Lane", st.session_state.generated_sections.get("The Next Lane", ""))
-                
+
         else:
             # Edit Mode
             st.header("Newsletter Edit Mode")
