@@ -1,22 +1,29 @@
-# Refactoring plan
+# Mobileye Newsletter Generator
 
+An AI-powered application for creating professional, customized newsletters for Mobileye with a focus on autonomous vehicles, automotive industry news, and AI developments.
+
+## Project Structure
+
+The refactored application follows a modular structure for improved maintainability:
+
+```
 mobileye-newsletter/
 ├── app.py                    # Main entry point (simplified)
 ├── config/                   # Configuration files
 │   ├── __init__.py
 │   ├── settings.py           # Global app settings
-│   └── prompts.py            # Existing prompts file
+│   └── prompts.py            # Default prompts
 ├── services/                 # Service layer
 │   ├── __init__.py
-│   ├── llm_service.py        # Existing LLM service
-│   └── news_service.py       # Existing news service
+│   ├── llm_service.py        # LLM provider integration
+│   └── news_service.py       # NewsAPI integration
 ├── ui/                       # UI components
 │   ├── __init__.py
 │   ├── components.py         # Reusable UI components
 │   ├── styles.py             # CSS styles
 │   ├── generate_view.py      # Generate content view
 │   ├── edit_view.py          # Edit content view
-│   └── discovery_view.py     # Existing discovery view
+│   └── discovery_view.py     # News discovery view
 ├── utils/                    # Utility functions
 │   ├── __init__.py
 │   ├── content_utils.py      # Content manipulation functions
@@ -24,6 +31,19 @@ mobileye-newsletter/
 └── models/                   # Data models
     ├── __init__.py
     └── newsletter.py         # Newsletter data structure
+```
+
+## Refactoring Benefits
+
+This refactored version provides several improvements over the original:
+
+1. **Modular Design**: Each component has a single responsibility
+2. **Improved Maintainability**: Smaller, focused files are easier to understand
+3. **Better Separation of Concerns**: UI, business logic, and data handling are separated
+4. **Reusable Components**: Common UI elements and utilities are abstracted
+5. **Structured Data Model**: Newsletter data is properly encapsulated
+6. **Centralized Configuration**: Settings are in dedicated files
+
 
 # Mobileye Newsletter Generator
 
