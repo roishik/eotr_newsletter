@@ -74,8 +74,8 @@ def update_session_state_from_newsletter(newsletter: Newsletter) -> None:
     # Save the loaded provider, model, and language separately for display
     st.session_state["loaded_provider"] = newsletter.selected_provider
     st.session_state["loaded_model"] = newsletter.selected_model
-    st.session_state["language"] = newsletter.language
-    st.session_state["theme"] = newsletter.theme
+    #st.session_state["language"] = newsletter.language # removed to avoid error
+    # st.session_state["theme"] = newsletter.theme # removed to avoid error
     
     # Main properties
     st.session_state["overall_prompt"] = newsletter.overall_prompt
