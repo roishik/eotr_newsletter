@@ -1,7 +1,7 @@
 # discovery_view.py
 import streamlit as st
 from datetime import datetime, timedelta
-from news_service import NewsAPIService
+from services.news_service import NewsAPIService
 
 def render_news_discovery():
     """
