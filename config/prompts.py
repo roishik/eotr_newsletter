@@ -31,7 +31,7 @@ DEFAULT_PROMPTS = {
         "Keep the response concise and focused on the key points.\n"
         "What to write about?\n"
         "Offer a new lens on the news, providing a fresh perspective or a unique angle that doubts the status quo or offers a new way of thinking.\n"
-        "IMPORTANT: Write your response in Hebrew. Make sure to use proper Hebrew grammar and right-to-left formatting."
+        "IMPORTANT: Write your response in Hebrew. Make sure to use proper Hebrew grammar and right-to-left formatting. You can write names of companies or technologies in English (e.g. Tesla, LiDAR, etc.)"
     ),
     "windshield": (
         "Summarize the articles in 2–3 concise paragraphs focusing on their relevance to Mobileye's work. "

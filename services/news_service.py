@@ -18,9 +18,9 @@ class NewsAPIService:
             "q": query,
             "from": from_date,
             "to": to_date,
-            "sortBy": "popularity",
+            "sortBy": sort_by,
             "language": "en",
-            "pageSize": 20,
+            "pageSize": page_size,
             "apiKey": self.api_key
         }
         response = requests.get(self.BASE_URL, params=params)
