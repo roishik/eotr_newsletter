@@ -8,7 +8,7 @@ from services.llm_service import LLMService
 
 def render_edit_view(llm_service: LLMService):
     """
-    Render the Edit Mode view.
+    Render the Edit Mode view with enhanced context for AI editing.
     
     Args:
         llm_service: Instance of LLMService for content editing
@@ -88,14 +88,66 @@ def render_edit_view(llm_service: LLMService):
                             st.session_state.edited_sections = {}
                             
                         text_to_edit = st.session_state.edited_sections.get(selected_section, original_text)
+                        
+                        # Gather context information for the selected section
+                        # First, determine which section we're editing to get the right context
+                        section_type = ""
+                        section_index = 0
+                        
+                        if selected_section == "Windshield View":
+                            section_type = "windshield"
+                        elif selected_section.startswith("Rearview Mirror "):
+                            section_type = "rearview"
+                            # Extract the index from "Rearview Mirror X"
+                            section_index = int(selected_section.split(" ")[-1])
+                        elif selected_section == "Dashboard Data":
+                            section_type = "dashboard"
+                        elif selected_section == "The Next Lane":
+                            section_type = "nextlane"
+                        
+                        # Get the URL sources for this section
+                        url_key = f"{section_type}_urls"
+                        if section_type == "rearview":
+                            url_key = f"rearview_urls_{section_index}"
+                            
+                        # Get notes for this section
+                        notes_key = f"{section_type}_notes"
+                        if section_type == "rearview":
+                            notes_key = f"rearview_notes_{section_index}"
+                            
+                        # Get section-specific prompt
+                        prompt_key = f"{section_type}_prompt"
+                        if section_type == "rearview":
+                            prompt_key = f"rearview_prompt_{section_index}"
+                        
+                        # Extract article text from URLs
+                        from utils.content_utils import extract_article_text
+                        urls = st.session_state.get(url_key, "")
+                        article_text = extract_article_text(urls) if urls else ""
+                        
+                        # Get user notes
+                        notes = st.session_state.get(notes_key, "")
+                        
+                        # Get section prompt
+                        section_prompt = st.session_state.get(prompt_key, "")
+                        
+                        # Get overall prompt
+                        overall_prompt = st.session_state.get("overall_prompt", "")
+                        
+                        # Call the enhanced edit_section_content function with all context
                         edited_text = edit_section_content(
                             llm_service=llm_service,
                             section_key=selected_section,
                             original_text=text_to_edit,
                             edit_prompt=edit_prompt,
                             provider=st.session_state.get("selected_provider", "OpenAI"),
-                            model=st.session_state.get("selected_model", "gpt-4o")
+                            model=st.session_state.get("selected_model", "gpt-4o"),
+                            article_text=article_text,
+                            notes=notes,
+                            section_prompt=section_prompt,
+                            overall_prompt=overall_prompt
                         )
+                        
                         st.session_state.edited_sections[selected_section] = edited_text
                         st.success("Edit applied!")
                         st.rerun()

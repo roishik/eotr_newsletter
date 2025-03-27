@@ -90,10 +90,16 @@ def edit_section_content(
     original_text: str, 
     edit_prompt: str,
     provider: str = "OpenAI",
-    model: str = "gpt-4o"
+    model: str = "gpt-4o",
+    # Add new parameters for context
+    article_text: str = "",
+    notes: str = "",
+    section_prompt: str = "",
+    overall_prompt: str = ""
 ) -> str:
     """
-    Edits content for a newsletter section using the selected LLM.
+    Edits content for a newsletter section using the selected LLM,
+    with full context from the original content generation.
     
     Args:
         llm_service: Instance of LLMService
@@ -102,24 +108,41 @@ def edit_section_content(
         edit_prompt: Instructions for editing
         provider: LLM provider name
         model: Model identifier
+        article_text: Combined text from articles used to generate the original content
+        notes: Additional notes from the user provided during original generation
+        section_prompt: Prompt specific to this section used in original generation
+        overall_prompt: Overall newsletter style prompt
         
     Returns:
         Edited content for the section
     """
     loading_animation()
     
-    from config.prompts import DEFAULT_PROMPTS
-    
+    # Build a more comprehensive prompt with all the context
     user_content = (
         f"Please edit the following newsletter section according to these instructions: {edit_prompt}\n\n"
-        f"Original Section Content:\n{original_text}"
+        f"Original Section Content:\n{original_text}\n\n"
     )
+    
+    # Add context information if available
+    if article_text:
+        user_content += f"Original Article Content Used:\n{article_text}\n\n"
+    
+    if notes:
+        user_content += f"User's Notes:\n{notes}\n\n"
+    
+    if section_prompt:
+        user_content += f"Section-Specific Guidelines:\n{section_prompt}\n\n"
+    
+    # Use the provided overall_prompt if available, otherwise use the default
+    from config.prompts import DEFAULT_PROMPTS
+    system_prompt = overall_prompt if overall_prompt else DEFAULT_PROMPTS["overall"]
     
     try:
         edited_text = llm_service.generate_content(
             provider=provider,
             model=model,
-            system_prompt=DEFAULT_PROMPTS["overall"],
+            system_prompt=system_prompt,
             user_prompt=user_content
         )
         return edited_text
