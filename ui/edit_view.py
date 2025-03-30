@@ -150,7 +150,6 @@ def render_edit_view(llm_service: LLMService):
                         
                         st.session_state.edited_sections[selected_section] = edited_text
                         st.success("Edit applied!")
-                        st.rerun()
         
         with col3:
             st.subheader("Edited Result")
