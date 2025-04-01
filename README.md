@@ -2,53 +2,6 @@
 
 An AI-powered application for creating professional, customized newsletters for Mobileye with a focus on autonomous vehicles, automotive industry news, and AI developments.
 
-## Project Structure
-
-The refactored application follows a modular structure for improved maintainability:
-
-```
-mobileye-newsletter/
-├── app.py                    # Main entry point (simplified)
-├── config/                   # Configuration files
-│   ├── __init__.py
-│   ├── settings.py           # Global app settings
-│   └── prompts.py            # Default prompts
-├── services/                 # Service layer
-│   ├── __init__.py
-│   ├── llm_service.py        # LLM provider integration
-│   └── news_service.py       # NewsAPI integration
-├── ui/                       # UI components
-│   ├── __init__.py
-│   ├── components.py         # Reusable UI components
-│   ├── styles.py             # CSS styles
-│   ├── generate_view.py      # Generate content view
-│   ├── edit_view.py          # Edit content view
-│   └── discovery_view.py     # News discovery view
-├── utils/                    # Utility functions
-│   ├── __init__.py
-│   ├── content_utils.py      # Content manipulation functions
-│   └── file_utils.py         # File operations (save/load)
-└── models/                   # Data models
-    ├── __init__.py
-    └── newsletter.py         # Newsletter data structure
-```
-
-## Refactoring Benefits
-
-This refactored version provides several improvements over the original:
-
-1. **Modular Design**: Each component has a single responsibility
-2. **Improved Maintainability**: Smaller, focused files are easier to understand
-3. **Better Separation of Concerns**: UI, business logic, and data handling are separated
-4. **Reusable Components**: Common UI elements and utilities are abstracted
-5. **Structured Data Model**: Newsletter data is properly encapsulated
-6. **Centralized Configuration**: Settings are in dedicated files
-
-
-# Mobileye Newsletter Generator
-
-An AI-powered application for creating professional, customized newsletters for Mobileye with a focus on autonomous vehicles, automotive industry news, and AI developments.
-
 ## Overview
 
 The Mobileye Newsletter Generator is a Streamlit-based application that helps content creators quickly produce well-structured company newsletters. It leverages large language models (LLMs) to generate content based on provided articles, URLs, and user instructions. The application supports multiple content sections, draft saving/loading, an AI-assisted editing mode, and multilingual output.
@@ -86,6 +39,16 @@ The Mobileye Newsletter Generator is a Streamlit-based application that helps co
 - Draft saving and loading
 - Progress tracking for newsletter completion
 - One-click HTML newsletter generation
+
+### Advanced Features
+- **Keyboard Shortcuts**: Quick access to common actions
+- **Drag-and-Drop**: Reorder sections with ease
+- **Auto-save**: Automatic saving of drafts to prevent data loss
+- **Real-time Collaboration**: Work together with team members
+- **Version Control**: Track changes and restore previous versions
+- **Analytics**: Monitor newsletter performance and engagement
+- **Rich Media Support**: Add images, videos, charts, and interactive content
+- **Multiple Export Formats**: Export to HTML, PDF, DOCX, Markdown, JSON, or YAML
 
 ## Getting Started
 
@@ -155,6 +118,25 @@ The application will be accessible at `http://localhost:8501` in your browser.
 3. **Browse Results**: View and filter search results.
 4. **Save Articles**: Mark interesting articles to use in your newsletter.
 
+### Collaboration Features
+
+1. **Join a Session**: Enter your name and join the collaboration session.
+2. **Real-time Updates**: See other users' activities and changes.
+3. **Version Control**: Track changes and restore previous versions if needed.
+4. **Auto-save**: Your work is automatically saved at regular intervals.
+
+### Keyboard Shortcuts
+
+- `Ctrl/Cmd + S`: Save draft
+- `Ctrl/Cmd + O`: Open draft
+- `Ctrl/Cmd + N`: New draft
+- `Ctrl/Cmd + G`: Generate section
+- `Ctrl/Cmd + E`: Edit section
+- `Ctrl/Cmd + P`: Preview newsletter
+- `Ctrl/Cmd + D`: Toggle dark mode
+- `Ctrl/Cmd + L`: Toggle language
+- `Ctrl/Cmd + ?`: Show keyboard shortcuts help
+
 ## Language Support
 
 The application supports generating content in both English and Hebrew:
@@ -168,6 +150,8 @@ The application supports generating content in both English and Hebrew:
 
 - **Save Draft**: Click "Save Draft" in the sidebar to store your current work.
 - **Load Draft**: Select a previous draft from the dropdown and click "Load Draft".
+- **Auto-save**: Drafts are automatically saved at regular intervals.
+- **Version History**: Access previous versions of your newsletter.
 
 ## Customization
 
@@ -184,14 +168,27 @@ The application's appearance can be customized by modifying the CSS in the `desi
 ```
 mobileye-newsletter-generator/
 ├── app.py                 # Main application file
-├── llm_service.py         # LLM provider integration
-├── news_service.py        # NewsAPI integration
-├── discovery_view.py      # News discovery interface
-├── prompts.py             # Default prompts including language variants
-├── design/
-│   └── styling.css        # Custom CSS styles
-├── drafts/                # Saved newsletter drafts
-└── requirements.txt       # Dependencies
+├── config/               # Configuration files
+│   ├── settings.py       # Global app settings
+│   └── prompts.py        # Default prompts
+├── services/            # Service layer
+│   ├── llm_service.py   # LLM provider integration
+│   └── news_service.py  # NewsAPI integration
+├── ui/                  # UI components
+│   ├── components.py    # Reusable UI components
+│   ├── styles.py        # CSS styles
+│   ├── generate_view.py # Generate content view
+│   ├── edit_view.py     # Edit content view
+│   └── discovery_view.py # News discovery view
+├── utils/              # Utility functions
+│   ├── content_utils.py # Content manipulation
+│   ├── file_utils.py    # File operations
+│   ├── autosave.py      # Auto-save functionality
+│   └── collaboration.py # Collaboration features
+├── models/             # Data models
+│   └── newsletter.py   # Newsletter data structure
+├── drafts/            # Saved newsletter drafts
+└── requirements.txt   # Dependencies
 ```
 
 ## Support and Contribution

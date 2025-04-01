@@ -3,6 +3,9 @@
 import streamlit as st
 import os
 import datetime
+from pathlib import Path
+import json
+from typing import Dict, Any, Optional
 
 # Import configuration
 from config.settings import APP_TITLE, APP_ICON, DEFAULT_THEME, DEFAULT_LANGUAGE
@@ -10,13 +13,17 @@ from config.prompts import DEFAULT_PROMPTS
 
 # Import services
 from services.llm_service import LLMService
+from services.news_service import NewsService
 
 # Import UI components
-from ui.components import add_logo_and_banner
-from ui.styles import apply_base_styles, apply_dark_theme
-from ui.generate_view import render_generate_view
-from ui.edit_view import render_edit_view
-from ui.discovery_view import render_news_discovery
+from ui.components import (
+    add_logo_and_banner,
+    add_language_selector,
+    add_theme_selector,
+    add_keyboard_shortcuts,
+    add_drag_drop_support,
+    render_section
+)
 
 # Import utils
 from utils.file_utils import (
@@ -27,8 +34,162 @@ from utils.file_utils import (
     update_session_state_from_newsletter,
     create_newsletter_from_session_state
 )
+from utils.content_utils import export_newsletter
+from utils.autosave import setup_autosave
+from utils.collaboration import setup_collaboration
 
-# Initialize application
+# Initialize services
+llm_service = LLMService()
+news_service = NewsService()
+
+# Setup session state
+if "newsletter_data" not in st.session_state:
+    st.session_state.newsletter_data = None
+if "current_section" not in st.session_state:
+    st.session_state.current_section = "Windshield View"
+if "newsletter_id" not in st.session_state:
+    st.session_state.newsletter_id = f"newsletter_{int(datetime.now().timestamp())}"
+
+# Setup UI components
+add_logo_and_banner()
+add_language_selector()
+add_theme_selector()
+add_keyboard_shortcuts()
+add_drag_drop_support()
+
+# Setup auto-save and collaboration
+setup_autosave()
+setup_collaboration()
+
+# Main content
+st.title("Newsletter Generator")
+
+# Sidebar controls
+with st.sidebar:
+    st.subheader("Controls")
+    
+    # New newsletter button
+    if st.button("📝 New Newsletter"):
+        st.session_state.newsletter_data = Newsletter()
+        st.session_state.newsletter_id = f"newsletter_{int(datetime.now().timestamp())}"
+        st.success("Created new newsletter!")
+    
+    # Load draft button
+    if st.button("📂 Load Draft"):
+        st.session_state.show_draft_dialog = True
+    
+    # Save draft button
+    if st.button("💾 Save Draft"):
+        if st.session_state.newsletter_data:
+            draft_path = Path("drafts") / f"{st.session_state.newsletter_id}.json"
+            draft_path.parent.mkdir(exist_ok=True)
+            with open(draft_path, "w", encoding="utf-8") as f:
+                json.dump(st.session_state.newsletter_data.to_dict(), f, ensure_ascii=False, indent=2)
+            st.success("Draft saved successfully!")
+    
+    # Export options
+    st.subheader("Export")
+    export_format = st.selectbox(
+        "Format",
+        ["HTML", "PDF", "DOCX", "Markdown", "JSON", "YAML"]
+    )
+    if st.button("📤 Export"):
+        if st.session_state.newsletter_data:
+            output_path = f"exports/{st.session_state.newsletter_id}.{export_format.lower()}"
+            export_newsletter(
+                st.session_state.newsletter_data.to_html(),
+                st.session_state.newsletter_data.to_dict(),
+                export_format,
+                output_path
+            )
+            st.success(f"Newsletter exported to {output_path}!")
+
+# Main content area
+if st.session_state.newsletter_data:
+    # Section selector
+    sections = [
+        "Windshield View",
+        "Dashboard Data",
+        "The Next Lane",
+        "Rearview Mirror 1",
+        "Rearview Mirror 2",
+        "Rearview Mirror 3"
+    ]
+    
+    selected_section = st.selectbox(
+        "Select Section",
+        sections,
+        index=sections.index(st.session_state.current_section)
+    )
+    st.session_state.current_section = selected_section
+    
+    # Section content
+    section_data = st.session_state.newsletter_data.get_section(selected_section)
+    if section_data:
+        render_section(selected_section, section_data.to_dict())
+        
+        # Section controls
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🔄 Generate Content"):
+                st.session_state.generate_section = True
+        
+        with col2:
+            if st.button("✏️ Edit Content"):
+                st.session_state.edit_section = True
+        
+        # Content generation
+        if st.session_state.get("generate_section", False):
+            with st.spinner("Generating content..."):
+                content = llm_service.generate_content(
+                    provider="openai",
+                    model="gpt-4",
+                    system_prompt=f"Generate content for the {selected_section} section of a Mobileye newsletter.",
+                    user_prompt="Please write engaging and informative content."
+                )
+                section_data.content = content
+                st.session_state.newsletter_data.update_section(selected_section, section_data)
+                st.session_state.generate_section = False
+                st.success("Content generated successfully!")
+        
+        # Content editing
+        if st.session_state.get("edit_section", False):
+            edited_content = st.text_area(
+                "Edit Content",
+                value=section_data.content,
+                height=300
+            )
+            if st.button("Save Changes"):
+                section_data.content = edited_content
+                st.session_state.newsletter_data.update_section(selected_section, section_data)
+                st.session_state.edit_section = False
+                st.success("Changes saved successfully!")
+else:
+    st.info("Create a new newsletter or load a draft to get started!")
+
+# Draft dialog
+if st.session_state.get("show_draft_dialog", False):
+    with st.sidebar.expander("Load Draft", expanded=True):
+        draft_files = list(Path("drafts").glob("*.json"))
+        if not draft_files:
+            st.info("No drafts found.")
+        else:
+            selected_draft = st.selectbox(
+                "Select Draft",
+                [f.name for f in draft_files]
+            )
+            if st.button("Load"):
+                with open(Path("drafts") / selected_draft, "r", encoding="utf-8") as f:
+                    draft_data = json.load(f)
+                    st.session_state.newsletter_data = Newsletter.from_dict(draft_data)
+                    st.session_state.newsletter_id = selected_draft.replace(".json", "")
+                    st.success("Draft loaded successfully!")
+                    st.session_state.show_draft_dialog = False
+                    st.rerun()
+        if st.button("Cancel"):
+            st.session_state.show_draft_dialog = False
+
 def initialize_app():
     """Initialize the application settings."""
     # Page configuration
@@ -133,12 +294,6 @@ def main():
     """Main application entry point."""
     # Initialize the application
     initialize_app()
-    
-    # Initialize LLM service
-    llm_service = LLMService()
-    
-    # Render header
-    add_logo_and_banner()
     
     # Render sidebar
     render_sidebar(llm_service)

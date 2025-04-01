@@ -5,6 +5,12 @@ import streamlit.components.v1 as components
 from typing import List, Dict, Tuple
 from services.llm_service import LLMService
 from ui.components import loading_animation
+import pdfkit
+import docx
+from docx.shared import Inches
+import markdown
+import json
+import yaml
 
 def extract_article_text(urls: str) -> str:
     """
@@ -227,3 +233,79 @@ def render_newsletter_preview(newsletter_html: str, height: int = 600) -> None:
         height: Height of the preview in pixels
     """
     components.html(newsletter_html, height=height, scrolling=True)
+
+def export_to_pdf(html_content: str, output_path: str) -> None:
+    """Export newsletter to PDF format."""
+    options = {
+        'page-size': 'A4',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'no-outline': None
+    }
+    pdfkit.from_string(html_content, output_path, options=options)
+
+def export_to_docx(html_content: str, output_path: str) -> None:
+    """Export newsletter to DOCX format."""
+    doc = docx.Document()
+    
+    # Convert HTML to plain text (basic conversion)
+    soup = BeautifulSoup(html_content, 'html.parser')
+    text = soup.get_text()
+    
+    # Add content to document
+    doc.add_paragraph(text)
+    
+    # Save the document
+    doc.save(output_path)
+
+def export_to_markdown(html_content: str, output_path: str) -> None:
+    """Export newsletter to Markdown format."""
+    # Convert HTML to Markdown
+    md_content = markdown.markdown(html_content, extensions=['tables'])
+    
+    # Save to file
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(md_content)
+
+def export_to_json(newsletter_data: Dict, output_path: str) -> None:
+    """Export newsletter to JSON format."""
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(newsletter_data, f, indent=4, ensure_ascii=False)
+
+def export_to_yaml(newsletter_data: Dict, output_path: str) -> None:
+    """Export newsletter to YAML format."""
+    with open(output_path, 'w', encoding='utf-8') as f:
+        yaml.dump(newsletter_data, f, allow_unicode=True, sort_keys=False)
+
+def export_newsletter(
+    newsletter_html: str,
+    newsletter_data: Dict,
+    format: str,
+    output_path: str
+) -> None:
+    """
+    Export newsletter in the specified format.
+    
+    Args:
+        newsletter_html: HTML content of the newsletter
+        newsletter_data: Dictionary containing newsletter data
+        format: Export format ('pdf', 'docx', 'md', 'json', 'yaml')
+        output_path: Path to save the exported file
+    """
+    format = format.lower()
+    
+    if format == 'pdf':
+        export_to_pdf(newsletter_html, output_path)
+    elif format == 'docx':
+        export_to_docx(newsletter_html, output_path)
+    elif format == 'md':
+        export_to_markdown(newsletter_html, output_path)
+    elif format == 'json':
+        export_to_json(newsletter_data, output_path)
+    elif format == 'yaml':
+        export_to_yaml(newsletter_data, output_path)
+    else:
+        raise ValueError(f"Unsupported export format: {format}")

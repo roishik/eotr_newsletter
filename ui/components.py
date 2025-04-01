@@ -1,4 +1,115 @@
 import streamlit as st
+from typing import Dict, Callable
+
+class KeyboardShortcuts:
+    """Manages keyboard shortcuts for the application."""
+    
+    def __init__(self):
+        self.shortcuts: Dict[str, Callable] = {}
+        self._setup_default_shortcuts()
+    
+    def _setup_default_shortcuts(self):
+        """Setup default keyboard shortcuts."""
+        self.shortcuts = {
+            "ctrl+s": self._save_draft,
+            "ctrl+o": self._open_draft,
+            "ctrl+n": self._new_draft,
+            "ctrl+g": self._generate_section,
+            "ctrl+e": self._edit_section,
+            "ctrl+p": self._preview_newsletter,
+            "ctrl+1": lambda: self._switch_section("Windshield View"),
+            "ctrl+2": lambda: self._switch_section("Dashboard Data"),
+            "ctrl+3": lambda: self._switch_section("The Next Lane"),
+            "ctrl+4": lambda: self._switch_section("Rearview Mirror 1"),
+            "ctrl+5": lambda: self._switch_section("Rearview Mirror 2"),
+            "ctrl+6": lambda: self._switch_section("Rearview Mirror 3"),
+            "ctrl+d": self._toggle_dark_mode,
+            "ctrl+l": self._toggle_language,
+            "ctrl+h": self._show_help
+        }
+    
+    def register_shortcut(self, key: str, callback: Callable):
+        """Register a new keyboard shortcut."""
+        self.shortcuts[key] = callback
+    
+    def _save_draft(self):
+        """Save current draft."""
+        if "save_draft" in st.session_state:
+            st.session_state.save_draft()
+    
+    def _open_draft(self):
+        """Open draft dialog."""
+        st.session_state.show_draft_dialog = True
+    
+    def _new_draft(self):
+        """Create new draft."""
+        st.session_state.clear_draft = True
+    
+    def _generate_section(self):
+        """Generate current section."""
+        if "current_section" in st.session_state:
+            st.session_state.generate_section = True
+    
+    def _edit_section(self):
+        """Edit current section."""
+        if "current_section" in st.session_state:
+            st.session_state.edit_section = True
+    
+    def _preview_newsletter(self):
+        """Preview newsletter."""
+        st.session_state.preview_newsletter = True
+    
+    def _switch_section(self, section: str):
+        """Switch to specified section."""
+        st.session_state.current_section = section
+    
+    def _toggle_dark_mode(self):
+        """Toggle dark mode."""
+        current_theme = st.session_state.get("theme", "Light")
+        st.session_state.theme = "Dark" if current_theme == "Light" else "Light"
+    
+    def _toggle_language(self):
+        """Toggle language."""
+        current_lang = st.session_state.get("language", "English")
+        st.session_state.language = "Hebrew" if current_lang == "English" else "English"
+    
+    def _show_help(self):
+        """Show keyboard shortcuts help."""
+        st.session_state.show_shortcuts_help = True
+
+def add_keyboard_shortcuts():
+    """Add keyboard shortcuts to the application."""
+    shortcuts = KeyboardShortcuts()
+    
+    # Add keyboard shortcuts help button
+    if st.sidebar.button("⌨️ Keyboard Shortcuts"):
+        st.session_state.show_shortcuts_help = True
+    
+    # Show shortcuts help dialog
+    if st.session_state.get("show_shortcuts_help", False):
+        with st.sidebar.expander("Keyboard Shortcuts", expanded=True):
+            st.markdown("""
+            ### Navigation
+            - `Ctrl + 1`: Windshield View
+            - `Ctrl + 2`: Dashboard Data
+            - `Ctrl + 3`: The Next Lane
+            - `Ctrl + 4-6`: Rearview Mirror sections
+            
+            ### Actions
+            - `Ctrl + S`: Save Draft
+            - `Ctrl + O`: Open Draft
+            - `Ctrl + N`: New Draft
+            - `Ctrl + G`: Generate Section
+            - `Ctrl + E`: Edit Section
+            - `Ctrl + P`: Preview Newsletter
+            
+            ### Settings
+            - `Ctrl + D`: Toggle Dark Mode
+            - `Ctrl + L`: Toggle Language
+            - `Ctrl + H`: Show this help
+            """)
+            if st.button("Close Help"):
+                st.session_state.show_shortcuts_help = False
 
 def add_logo_and_banner(title="Mobileye Newsletter Generator", subtitle="Generate professional newsletters with AI assistance"):
     """Renders the application header with logo and banner."""
@@ -150,3 +261,124 @@ def display_language_indicator():
     selected_language = st.session_state.get("language", "English")
     language_indicator = "🇺🇸 English" if selected_language == "English" else "🇮🇱 עברית"
     st.info(f"Selected Language: {language_indicator}", icon="🌐")
+
+def add_section_controls(section_name: str, section_data: Dict):
+    """Add controls for managing a section."""
+    col1, col2, col3 = st.columns([1, 1, 1])
+    
+    with col1:
+        if st.button("🔄 Generate", key=f"generate_{section_name}"):
+            st.session_state.generate_section = True
+            st.session_state.current_section = section_name
+    
+    with col2:
+        if st.button("✏️ Edit", key=f"edit_{section_name}"):
+            st.session_state.edit_section = True
+            st.session_state.current_section = section_name
+    
+    with col3:
+        if st.button("🗑️ Delete", key=f"delete_{section_name}"):
+            st.session_state.delete_section = True
+            st.session_state.current_section = section_name
+    
+    # Add drag handle for reordering
+    st.markdown(f"""
+        <div class="drag-handle" data-section="{section_name}">
+            <i class="fas fa-grip-vertical"></i>
+        </div>
+    """, unsafe_allow_html=True)
+
+def add_drag_drop_support():
+    """Add drag-and-drop support for reordering sections."""
+    st.markdown("""
+        <style>
+            .drag-handle {
+                cursor: move;
+                padding: 5px;
+                color: #666;
+                display: inline-block;
+            }
+            .drag-handle:hover {
+                color: #000;
+            }
+            .dragging {
+                opacity: 0.5;
+                background: #f0f0f0;
+            }
+            .drag-over {
+                border-top: 2px solid #007bff;
+            }
+        </style>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const dragHandles = document.querySelectorAll('.drag-handle');
+                let draggedSection = null;
+                
+                dragHandles.forEach(handle => {
+                    handle.addEventListener('dragstart', function(e) {
+                        draggedSection = this.closest('.section-container');
+                        draggedSection.classList.add('dragging');
+                    });
+                    
+                    handle.addEventListener('dragend', function(e) {
+                        draggedSection.classList.remove('dragging');
+                        draggedSection = null;
+                    });
+                });
+                
+                const sections = document.querySelectorAll('.section-container');
+                sections.forEach(section => {
+                    section.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        if (this !== draggedSection) {
+                            this.classList.add('drag-over');
+                        }
+                    });
+                    
+                    section.addEventListener('dragleave', function(e) {
+                        this.classList.remove('drag-over');
+                    });
+                    
+                    section.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('drag-over');
+                        
+                        if (this !== draggedSection) {
+                            const sections = Array.from(document.querySelectorAll('.section-container'));
+                            const fromIndex = sections.indexOf(draggedSection);
+                            const toIndex = sections.indexOf(this);
+                            
+                            // Update section order in session state
+                            const sectionOrder = st.session_state.section_order || [];
+                            const section = sectionOrder[fromIndex];
+                            sectionOrder.splice(fromIndex, 1);
+                            sectionOrder.splice(toIndex, 0, section);
+                            st.session_state.section_order = sectionOrder;
+                            
+                            // Reorder sections in DOM
+                            if (fromIndex < toIndex) {
+                                this.parentNode.insertBefore(draggedSection, this.nextSibling);
+                            } else {
+                                this.parentNode.insertBefore(draggedSection, this);
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+    """, unsafe_allow_html=True)
+
+def render_section(section_name: str, section_data: Dict):
+    """Render a section with drag-and-drop support."""
+    st.markdown(f"""
+        <div class="section-container" draggable="true">
+            <h3>{section_name}</h3>
+            <div class="section-content">
+                {section_data.get('content', '')}
+            </div>
+    """, unsafe_allow_html=True)
+    
+    add_section_controls(section_name, section_data)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
