@@ -27,6 +27,10 @@ from ui.components import (
     add_drag_drop_support,
     render_section
 )
+from ui.styles import apply_base_styles, apply_dark_theme
+from ui.generate_view import render_generate_view
+from ui.edit_view import render_edit_view
+from ui.discovery_view import render_news_discovery
 
 # Import utils
 from utils.file_utils import (
