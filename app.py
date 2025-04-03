@@ -15,6 +15,9 @@ from config.prompts import DEFAULT_PROMPTS
 from services.llm_service import LLMService
 from services.news_service import NewsService
 
+# Import models
+from models.newsletter import Newsletter
+
 # Import UI components
 from ui.components import (
     add_logo_and_banner,

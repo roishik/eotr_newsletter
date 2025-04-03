@@ -8,7 +8,7 @@ from ui.components import loading_animation
 import pdfkit
 import docx
 from docx.shared import Inches
-import markdown
+import html2text
 import json
 import yaml
 
@@ -264,7 +264,10 @@ def export_to_docx(html_content: str, output_path: str) -> None:
 def export_to_markdown(html_content: str, output_path: str) -> None:
     """Export newsletter to Markdown format."""
     # Convert HTML to Markdown
-    md_content = markdown.markdown(html_content, extensions=['tables'])
+    h = html2text.HTML2Text()
+    h.ignore_links = False
+    h.ignore_images = False
+    md_content = h.handle(html_content)
     
     # Save to file
     with open(output_path, 'w', encoding='utf-8') as f:
