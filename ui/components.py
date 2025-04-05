@@ -262,6 +262,64 @@ def display_language_indicator():
     language_indicator = "🇺🇸 English" if selected_language == "English" else "🇮🇱 עברית"
     st.info(f"Selected Language: {language_indicator}", icon="🌐")
 
+def add_theme_selector():
+    """Add a theme selector to the application with a modern toggle switch appearance."""
+    # Get current theme from session state
+    current_theme = st.session_state.get("theme", "Light")
+    
+    # Create custom CSS for the theme selector
+    st.markdown("""
+        <style>
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--background-color);
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .theme-switch-label {
+            margin-right: 10px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        .theme-icon {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    # Create columns for the theme selector layout
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        # Create the theme selector with radio buttons
+        new_theme = st.radio(
+            "🎨 Theme",
+            options=["Light", "Dark"],
+            horizontal=True,
+            key="theme_selector",
+            index=0 if current_theme == "Light" else 1
+        )
+    
+    with col2:
+        # Show theme icon
+        theme_icon = "☀️" if new_theme == "Light" else "🌙"
+        st.markdown(f"<h3 style='text-align: center; margin: 0;'>{theme_icon}</h3>", unsafe_allow_html=True)
+    
+    # Update theme in session state if changed
+    if new_theme != current_theme:
+        st.session_state.theme = new_theme
+        # Apply theme change
+        if new_theme == "Dark":
+            from ui.styles import apply_dark_theme
+            apply_dark_theme()
+        else:
+            from ui.styles import apply_base_styles
+            apply_base_styles()
+
 def add_section_controls(section_name: str, section_data: Dict):
     """Add controls for managing a section."""
     col1, col2, col3 = st.columns([1, 1, 1])

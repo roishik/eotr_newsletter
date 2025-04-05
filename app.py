@@ -2,7 +2,7 @@
 
 import streamlit as st
 import os
-import datetime
+from datetime import datetime
 from pathlib import Path
 import json
 from typing import Dict, Any, Optional
@@ -13,7 +13,7 @@ from config.prompts import DEFAULT_PROMPTS
 
 # Import services
 from services.llm_service import LLMService
-from services.news_service import NewsService
+from services.news_service import NewsAPIService
 
 # Import models
 from models.newsletter import Newsletter
@@ -21,7 +21,7 @@ from models.newsletter import Newsletter
 # Import UI components
 from ui.components import (
     add_logo_and_banner,
-    add_language_selector,
+    display_language_indicator,
     add_theme_selector,
     add_keyboard_shortcuts,
     add_drag_drop_support,
@@ -47,7 +47,7 @@ from utils.collaboration import setup_collaboration
 
 # Initialize services
 llm_service = LLMService()
-news_service = NewsService()
+news_service = NewsAPIService()
 
 # Setup session state
 if "newsletter_data" not in st.session_state:
@@ -59,7 +59,7 @@ if "newsletter_id" not in st.session_state:
 
 # Setup UI components
 add_logo_and_banner()
-add_language_selector()
+display_language_indicator()
 add_theme_selector()
 add_keyboard_shortcuts()
 add_drag_drop_support()
