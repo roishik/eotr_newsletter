@@ -7,8 +7,18 @@ from pathlib import Path
 import json
 from typing import Dict, Any, Optional
 
-# Import configuration
+# Import configuration first
 from config.settings import APP_TITLE, APP_ICON, DEFAULT_THEME, DEFAULT_LANGUAGE
+
+# Set page configuration
+st.set_page_config(
+    page_title=APP_TITLE, 
+    page_icon=APP_ICON, 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
+
+# Import remaining configuration
 from config.prompts import DEFAULT_PROMPTS
 
 # Import services
@@ -199,14 +209,6 @@ if st.session_state.get("show_draft_dialog", False):
 
 def initialize_app():
     """Initialize the application settings."""
-    # Page configuration
-    st.set_page_config(
-        page_title=APP_TITLE, 
-        page_icon=APP_ICON, 
-        layout="wide", 
-        initial_sidebar_state="expanded"
-    )
-    
     # Apply base styles
     apply_base_styles()
     
