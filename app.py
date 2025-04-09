@@ -226,7 +226,7 @@ def initialize_app():
         st.session_state.edit_mode = False
         
     if "timestamp" not in st.session_state:
-        st.session_state.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        st.session_state.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
     if "theme" not in st.session_state:
         st.session_state.theme = DEFAULT_THEME
