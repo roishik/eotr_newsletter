@@ -1,0 +1,31 @@
+{
+    "overall_prompt": "What are you doing?:\nYou are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). Avoid AI chatbot introductions, such as 'here is the response to your request'.\nWriting style:\nWrite in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary\u2014just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging. Don't be too optimistic and avoid making announcements that are bigger than the actual news.\nLength:\nKeep the response concise and focused on the key points.\nWhat to write about?\nOffer a new lens on the news, providing a fresh perspective or a unique angle that doubts the status quo or offers a new way of thinking.",
+    "windshield_urls": "",
+    "windshield_notes": "",
+    "windshield_prompt": "Summarize the articles in 2\u20133 concise paragraphs focusing on their relevance to Mobileye's work. Please be succinct and avoid unnecessary details. Write in first-person singular.",
+    "num_rearview": 3,
+    "dashboard_urls": "",
+    "dashboard_notes": "",
+    "dashboard_prompt": "Write 3 parts:\n- What's New: Describe key trends or insights concisely.\n- Why It Matters: Explain the impact on Mobileye succinctly.\n- What I Think: Share a brief personal opinion.",
+    "nextlane_urls": "https://techcrunch.com/2025/04/09/wayves-self-driving-tech-is-headed-to-nissan-vehicles/",
+    "nextlane_notes": "nissan choose wayves over mobileye. write about the new generation of ai for driving startups",
+    "nextlane_prompt": "Summarize competitor/academic news in 2\u20133 concise paragraphs, highlighting its implications for Mobileye. Keep it brief and to the point.",
+    "generated_sections": {
+        "Rearview Mirror 1": "**Kawasaki's Corleo Robo-Explorer: A Leap in Off-Road Innovation**  \nKawasaki's Corleo Robo-Explorer may signal a shift towards legged mobility in vehicles, sparking curiosity about future autonomous designs\u2014perhaps even an \"autonomous horse.\"",
+        "The Next Lane": "## Nissan's Wayve Partnership Signals Shift in ADAS Landscape\n\nNissan's recent decision to integrate Wayve's self-driving software into its ProPilot ADAS system by 2027 marks a significant development in the autonomous driving space. This partnership with the UK startup, which has secured over $1.3 billion in funding from tech giants like Nvidia and Microsoft, highlights the growing appeal of AI-first, data-driven approaches to vehicle autonomy. Wayve's \"Embodied AI\" system differs from map-dependent solutions by using a self-learning approach that works with existing sensor arrays and adapts across environments\u2014positioning it as a flexible, cost-effective alternative in the market.\n\nThis development represents both a challenge and an opportunity for Mobileye. While it's clear competitors are making inroads with major OEMs, Wayve's emphasis on adaptable, hardware-agnostic solutions that don't rely on HD maps aligns with broader industry trends toward more flexible ADAS architectures. As automakers increasingly seek systems that can be deployed across their fleets without significant hardware investments, we might consider how our REM mapping approach can evolve to offer similar flexibility while maintaining the safety advantages that have defined our technology leadership."
+    },
+    "edited_sections": {},
+    "selected_provider": "Anthropic",
+    "selected_model": "claude-3-7-sonnet-latest",
+    "language": "English",
+    "theme": "Light",
+    "rearview_urls_1": "https://canadamotoguide.com/2025/04/09/kawasaki-corleo-robo-explorer-an-off-road-vehicle-with-legs/",
+    "rearview_notes_1": "will are next project will be autonomous horse?",
+    "rearview_prompt_1": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_2": "",
+    "rearview_notes_2": "nissan choose wayves ",
+    "rearview_prompt_2": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_3": "",
+    "rearview_notes_3": "",
+    "rearview_prompt_3": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total."
+}
