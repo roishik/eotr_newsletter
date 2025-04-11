@@ -11,9 +11,6 @@ class KeyboardShortcuts:
     def _setup_default_shortcuts(self):
         """Setup default keyboard shortcuts."""
         self.shortcuts = {
-            "ctrl+s": self._save_draft,
-            "ctrl+o": self._open_draft,
-            "ctrl+n": self._new_draft,
             "ctrl+g": self._generate_section,
             "ctrl+e": self._edit_section,
             "ctrl+p": self._preview_newsletter,
@@ -31,19 +28,6 @@ class KeyboardShortcuts:
     def register_shortcut(self, key: str, callback: Callable):
         """Register a new keyboard shortcut."""
         self.shortcuts[key] = callback
-    
-    def _save_draft(self):
-        """Save current draft."""
-        if "save_draft" in st.session_state:
-            st.session_state.save_draft()
-    
-    def _open_draft(self):
-        """Open draft dialog."""
-        st.session_state.show_draft_dialog = True
-    
-    def _new_draft(self):
-        """Create new draft."""
-        st.session_state.clear_draft = True
     
     def _generate_section(self):
         """Generate current section."""
@@ -96,9 +80,6 @@ def add_keyboard_shortcuts():
             - `Ctrl + 4-6`: Rearview Mirror sections
             
             ### Actions
-            - `Ctrl + S`: Save Draft
-            - `Ctrl + O`: Open Draft
-            - `Ctrl + N`: New Draft
             - `Ctrl + G`: Generate Section
             - `Ctrl + E`: Edit Section
             - `Ctrl + P`: Preview Newsletter

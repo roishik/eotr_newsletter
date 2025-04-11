@@ -83,27 +83,6 @@ st.title("Newsletter Generator")
 
 # Sidebar controls
 with st.sidebar:
-    st.subheader("Controls")
-    
-    # New newsletter button
-    if st.button("📝 New Newsletter"):
-        st.session_state.newsletter_data = Newsletter()
-        st.session_state.newsletter_id = f"newsletter_{int(datetime.now().timestamp())}"
-        st.success("Created new newsletter!")
-    
-    # Load draft button
-    if st.button("📂 Load Draft"):
-        st.session_state.show_draft_dialog = True
-    
-    # Save draft button
-    if st.button("💾 Save Draft"):
-        if st.session_state.newsletter_data:
-            draft_path = Path("drafts") / f"{st.session_state.newsletter_id}.json"
-            draft_path.parent.mkdir(exist_ok=True)
-            with open(draft_path, "w", encoding="utf-8") as f:
-                json.dump(st.session_state.newsletter_data.to_dict(), f, ensure_ascii=False, indent=2)
-            st.success("Draft saved successfully!")
-    
     # Export options
     st.subheader("Export")
     export_format = st.selectbox(
