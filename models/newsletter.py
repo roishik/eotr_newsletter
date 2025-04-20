@@ -367,3 +367,23 @@ class Newsletter:
             summary[sentiment] += 1
         
         return summary
+
+    def add_articles_to_section(self, section_name: str, articles: List[Dict]) -> None:
+        """Add articles to a specific section."""
+        # Convert articles to URLs string
+        urls = "\n".join([article["url"] for article in articles])
+        
+        # Add to appropriate section
+        if section_name == "Windshield View":
+            self.windshield.urls = urls
+        elif section_name == "Dashboard Data":
+            self.dashboard.urls = urls
+        elif section_name == "The Next Lane":
+            self.nextlane.urls = urls
+        elif section_name.startswith("Rearview Mirror"):
+            try:
+                index = int(section_name.split()[-1])
+                if index in self.rearview_sections:
+                    self.rearview_sections[index].urls = urls
+            except ValueError:
+                pass

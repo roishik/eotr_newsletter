@@ -2,6 +2,7 @@
 import streamlit as st
 from datetime import datetime, timedelta
 from services.news_service import NewsAPIService
+from models.newsletter import Newsletter
 
 def render_news_discovery():
     """
@@ -306,7 +307,23 @@ def render_news_discovery():
         # Add a button to add selected articles to newsletter with improved styling
         col1, col2 = st.columns([3, 1])
         with col2:
-            st.button("➕ Add to Newsletter", key="add_to_newsletter")
+            if st.button("➕ Add to Newsletter", key="add_to_newsletter"):
+                if selected_articles:
+                    # Get current newsletter data
+                    if "newsletter_data" not in st.session_state:
+                        st.session_state.newsletter_data = Newsletter()
+                    
+                    # Let user choose which section to add articles to
+                    section = st.selectbox(
+                        "Select section to add articles",
+                        options=st.session_state.newsletter_data.get_section_names(),
+                        key="add_to_section"
+                    )
+                    
+                    # Add articles to the selected section
+                    st.session_state.newsletter_data.add_articles_to_section(section, selected_articles)
+                    st.success(f"Added {len(selected_articles)} articles to {section}!")
+                    st.rerun()
             
         # Add option to clear selections
         with col1:

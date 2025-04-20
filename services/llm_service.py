@@ -46,7 +46,8 @@ class LLMService:
         """Checks the status of API keys."""
         return {
             "OpenAI": bool(os.getenv("OPENAI_API_KEY")),
-            "Anthropic": bool(os.getenv("ANTHROPIC_API_KEY"))
+            "Anthropic": bool(os.getenv("ANTHROPIC_API_KEY")),
+            "NewsAPI": bool(os.getenv("NEWSAPI_API_KEY"))
         }
 
     def generate_content(

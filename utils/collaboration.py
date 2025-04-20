@@ -105,7 +105,7 @@ def setup_collaboration():
         st.session_state.user_id = f"user_{int(time.time())}"
     
     if "user_name" not in st.session_state:
-        st.session_state.user_name = st.text_input("Your name:", value=f"User {st.session_state.user_id[-4:]}")
+        st.session_state.user_name = f"Anonymous User {st.session_state.user_id[-4:]}"
     
     # Add collaboration panel to sidebar
     with st.sidebar.expander("Collaboration", expanded=False):
