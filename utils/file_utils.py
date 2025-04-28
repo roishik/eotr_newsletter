@@ -71,7 +71,7 @@ def update_session_state_from_newsletter(newsletter: Newsletter) -> None:
     Args:
         newsletter: Newsletter object to load from
     """
-    # Save the loaded provider, model, and language separately for display
+    # Save the loaded provider and model separately for display
     st.session_state["loaded_provider"] = newsletter.selected_provider
     st.session_state["loaded_model"] = newsletter.selected_model
     #st.session_state["language"] = newsletter.language # removed to avoid error
@@ -99,10 +99,10 @@ def update_session_state_from_newsletter(newsletter: Newsletter) -> None:
     st.session_state["nextlane_prompt"] = newsletter.nextlane.prompt
     
     # Rearview sections
-    for i, section in newsletter.rearview_sections.items():
-        st.session_state[f"rearview_urls_{i}"] = section.urls
-        st.session_state[f"rearview_notes_{i}"] = section.notes
-        st.session_state[f"rearview_prompt_{i}"] = section.prompt
+    for i in range(1, newsletter.num_rearview + 1):
+        st.session_state[f"rearview_urls_{i}"] = newsletter.rearview_sections[i].urls
+        st.session_state[f"rearview_notes_{i}"] = newsletter.rearview_sections[i].notes
+        st.session_state[f"rearview_prompt_{i}"] = newsletter.rearview_sections[i].prompt
 
 def create_newsletter_from_session_state() -> Newsletter:
     """
