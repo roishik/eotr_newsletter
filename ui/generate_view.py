@@ -181,8 +181,10 @@ def render_generate_view(llm_service: LLMService):
                 sections.append(("The Next Lane", st.session_state.generated_sections.get("The Next Lane", "Not generated yet.")))
                 
                 for title, content in sections:
+                    # Determine text direction based on language
+                    dir_attr = 'rtl' if st.session_state.get('language', 'English') == "Hebrew" else 'ltr'
                     sections_content += f"""
-                    <div class="section">
+                    <div class="section" dir="{dir_attr}">
                         <h2>{title}</h2>
                         <p>{content}</p>
                     </div>

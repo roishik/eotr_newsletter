@@ -249,6 +249,15 @@ def get_newsletter_html_style(theme="light"):
                 font-size: 14px;
                 color: #9aa0a6;
             }
+            .section[dir="rtl"] {
+                text-align: right;
+            }
+            .section[dir="rtl"] h2 {
+                text-align: right;
+            }
+            .section[dir="rtl"] p {
+                text-align: right;
+            }
         </style>
         """
     else:
@@ -309,6 +318,15 @@ def get_newsletter_html_style(theme="light"):
                 text-align: center;
                 font-size: 14px;
                 color: #777;
+            }
+            .section[dir="rtl"] {
+                text-align: right;
+            }
+            .section[dir="rtl"] h2 {
+                text-align: right;
+            }
+            .section[dir="rtl"] p {
+                text-align: right;
             }
         </style>
         """
