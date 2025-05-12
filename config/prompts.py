@@ -2,8 +2,8 @@
 DEFAULT_PROMPTS = {
     "overall": (
         "What are you doing?:\n"
-        "You are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. "
-        "Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). "
+        "You are writing a section inside a newsletter about autonomous vehicles, the automotive industry, and AI technology. "
+        "Only write about the relevant content of this section - This text will be a part of the larger newsletter (no need for welcome notes). "
         "Avoid AI chatbot introductions, such as 'here is the response to your request'.\n"
         "Writing style:\n"
         "Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, "
@@ -18,8 +18,8 @@ DEFAULT_PROMPTS = {
     ),
     "overall_hebrew": (
         "What are you doing?:\n"
-        "You are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. "
-        "Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). "
+        "You are writing a section inside a newsletter about autonomous vehicles, the automotive industry, and AI technology. "
+        "Only write about the relevant content of this section - This text will be a part of the larger newsletter (no need for welcome notes). "
         "Avoid AI chatbot introductions, such as 'here is the response to your request'.\n"
         "Writing style:\n"
         "Write in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, "
@@ -34,7 +34,7 @@ DEFAULT_PROMPTS = {
         "IMPORTANT: Write your response in Hebrew. Make sure to use proper Hebrew grammar and right-to-left formatting. You can write names of companies or technologies in English (e.g. Tesla, LiDAR, etc.)"
     ),
     "windshield": (
-        "Summarize the articles in 2–3 concise paragraphs focusing on their relevance to Mobileye's work. "
+        "Summarize the articles in 2–3 concise paragraphs focusing on their relevance to the autonomous vehicle and AI industry. "
         "Please be succinct and avoid unnecessary details. Write in first-person singular."
     ),
     "rearview": (
@@ -43,11 +43,11 @@ DEFAULT_PROMPTS = {
     "dashboard": (
         "Write 3 parts:\n"
         "- What's New: Describe key trends or insights concisely.\n"
-        "- Why It Matters: Explain the impact on Mobileye succinctly.\n"
+        "- Why It Matters: Explain the impact on the industry succinctly.\n"
         "- What I Think: Share a brief personal opinion."
     ),
     "nextlane": (
-        "Summarize competitor/academic news in 2–3 concise paragraphs, highlighting its implications for Mobileye. "
+        "Summarize competitor/academic news in 2–3 concise paragraphs, highlighting its implications for the autonomous vehicle industry. "
         "Keep it brief and to the point."
     )
 }

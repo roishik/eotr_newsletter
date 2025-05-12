@@ -1,0 +1,30 @@
+{
+    "overall_prompt": "What are you doing?:\nYou are writing a section inside an internal Mobileye newsletter on autonomous cars, the car industry, and AI news. Only write about the relevant content of this section - This text will be a part of the big newsletter (no need for welcome notes). Avoid AI chatbot introductions, such as 'here is the response to your request'.\nWriting style:\nWrite in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary\u2014just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging. Don't be too optimistic and avoid making announcements that are bigger than the actual news.\nLength:\nKeep the response concise and focused on the key points.\nWhat to write about?\nOffer a new lens on the news, providing a fresh perspective or a unique angle that doubts the status quo or offers a new way of thinking.",
+    "windshield_urls": "",
+    "windshield_notes": "",
+    "windshield_prompt": "Summarize the articles in 2\u20133 concise paragraphs focusing on their relevance to Mobileye's work. Please be succinct and avoid unnecessary details. Write in first-person singular.",
+    "num_rearview": 3,
+    "dashboard_urls": "",
+    "dashboard_notes": "",
+    "dashboard_prompt": "Write 3 parts:\n- What's New: Describe key trends or insights concisely.\n- Why It Matters: Explain the impact on Mobileye succinctly.\n- What I Think: Share a brief personal opinion.",
+    "nextlane_urls": "",
+    "nextlane_notes": "",
+    "nextlane_prompt": "Summarize competitor/academic news in 2\u20133 concise paragraphs, highlighting its implications for Mobileye. Keep it brief and to the point.",
+    "generated_sections": {
+        "Rearview Mirror 1": "**End of an Era: Buffett Passes the Torch at Berkshire Hathaway**\n\nAt 94, Warren Buffett will retire as CEO of his $1.16 trillion investment empire at year's end, surprisingly announcing Greg Abel as his successor while maintaining he won't sell a single share."
+    },
+    "edited_sections": {},
+    "selected_provider": "Anthropic",
+    "selected_model": "claude-3-7-sonnet-latest",
+    "language": "English",
+    "theme": "Light",
+    "rearview_urls_1": "https://www.bbc.com/news/articles/cqj4nev7p70o",
+    "rearview_notes_1": "Warren buffet steps down. end of an era",
+    "rearview_prompt_1": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_2": "",
+    "rearview_notes_2": "",
+    "rearview_prompt_2": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_3": "",
+    "rearview_notes_3": "",
+    "rearview_prompt_3": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total."
+}
