@@ -22,22 +22,35 @@ def extract_article_text(urls: str) -> str:
     Returns:
         Combined text from all articles
     """
+    print(f"\n[Article Extraction] Starting extraction for URLs: {urls}")
     combined_text = ""
     url_list = [url.strip() for url in urls.split(";;") if url.strip()]
     
+    print(f"[Article Extraction] Found {len(url_list)} URLs to process")
+    
     for url in url_list:
         try:
+            print(f"[Article Extraction] Fetching content from: {url}")
             response = requests.get(url)
             response.raise_for_status()
+            print(f"[Article Extraction] Response status code: {response.status_code}")
+            
             soup = BeautifulSoup(response.text, "html.parser")
             paragraphs = soup.find_all("p")
+            print(f"[Article Extraction] Found {len(paragraphs)} paragraphs")
+            
             article = "\n".join(p.get_text() for p in paragraphs)
+            print(f"[Article Extraction] Extracted text length: {len(article)} characters")
+            
             combined_text += article + "\n\n"
         except Exception as e:
-            # Return error message without stopping execution
-            combined_text += f"Error fetching URL {url}: {str(e)}\n\n"
+            error_msg = f"Error fetching URL {url}: {str(e)}"
+            print(f"[Article Extraction] {error_msg}")
+            combined_text += error_msg + "\n\n"
     
-    return combined_text.strip()
+    final_text = combined_text.strip()
+    print(f"[Article Extraction] Final combined text length: {len(final_text)} characters")
+    return final_text
 
 def generate_section_content(
     llm_service: LLMService, 
@@ -65,11 +78,19 @@ def generate_section_content(
     Returns:
         Generated content for the section
     """
+    print(f"\n[Content Generation] Starting content generation for section: {section_key}")
+    print(f"[Content Generation] Using provider: {provider}, model: {model}")
+    print(f"[Content Generation] Article text length: {len(article_text)} characters")
+    print(f"[Content Generation] Notes: {notes}")
+    print(f"[Content Generation] Section prompt: {section_prompt}")
+    
     loading_animation()
     
     user_content = (
         f"{section_prompt}\n\nCombined Article Content:\n{article_text}\n\nNotes: {notes if notes else ''}"
     )
+    
+    print(f"[Content Generation] Combined prompt length: {len(user_content)} characters")
     
     # Select the appropriate overall prompt based on language
     from config.prompts import DEFAULT_PROMPTS
@@ -80,15 +101,19 @@ def generate_section_content(
         system_prompt = DEFAULT_PROMPTS["overall"]
     
     try:
+        print("[Content Generation] Calling LLM service...")
         generated_text = llm_service.generate_content(
             provider=provider,
             model=model,
             system_prompt=system_prompt,
             user_prompt=user_content
         )
+        print(f"[Content Generation] Successfully generated content of length: {len(generated_text)} characters")
         return generated_text
     except Exception as e:
-        return f"Error generating content: {str(e)}"
+        error_msg = f"Error generating content: {str(e)}"
+        print(f"[Content Generation] {error_msg}")
+        return error_msg
 
 def edit_section_content(
     llm_service: LLMService, 

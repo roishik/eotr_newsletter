@@ -88,6 +88,12 @@ def render_generate_view(llm_service: LLMService):
             
             if st.button(f"Generate Rearview {i} Section"):
                 with st.spinner(f"Generating Rearview {i} section..."):
+                    print(f"\n[Generate View] Generating Rearview Mirror {i}")
+                    print(f"[Generate View] Session state keys: {st.session_state.keys()}")
+                    print(f"[Generate View] rearview_urls_{i}: {st.session_state.get(f'rearview_urls_{i}', '')}")
+                    print(f"[Generate View] rearview_notes_{i}: {st.session_state.get(f'rearview_notes_{i}', '')}")
+                    print(f"[Generate View] rearview_prompt_{i}: {st.session_state.get(f'rearview_prompt_{i}', '')}")
+                    
                     article_text = extract_article_text(st.session_state[f"rearview_urls_{i}"])
                     generated_text = generate_section_content(
                         llm_service=llm_service,
@@ -105,6 +111,7 @@ def render_generate_view(llm_service: LLMService):
                         st.session_state.generated_sections = {}
                     
                     st.session_state.generated_sections[f"Rearview Mirror {i}"] = generated_text
+                    print(f"[Generate View] Generated content length: {len(generated_text)} characters")
                     st.success(f"Rearview {i} section generated!")
 
         # Dashboard Data Section
