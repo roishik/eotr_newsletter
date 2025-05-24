@@ -7,7 +7,7 @@ APP_TITLE = "Mobileye Newsletter Generator"
 APP_SUBTITLE = "Generate professional newsletters with AI assistance"
 APP_ICON = "🚗"
 DEFAULT_THEME = "Light"
-DEFAULT_LANGUAGE = "Hebrew"
+DEFAULT_LANGUAGE = "English"
 
 # Directory settings
 DRAFTS_DIR = "drafts"

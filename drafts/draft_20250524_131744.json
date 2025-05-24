@@ -1,0 +1,30 @@
+{
+    "overall_prompt": "What are you doing?:\nYou are writing a section inside a newsletter about autonomous vehicles, the automotive industry, and AI technology. Only write about the relevant content of this section - This text will be a part of the larger newsletter (no need for welcome notes). Avoid AI chatbot introductions, such as 'here is the response to your request'.\nWriting style:\nWrite in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary\u2014just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging. Don't be too optimistic and avoid making announcements that are bigger than the actual news.\nLength:\nKeep the response concise and focused on the key points.\nWhat to write about?\nOffer a new lens on the news, providing a fresh perspective or a unique angle that doubts the status quo or offers a new way of thinking.",
+    "windshield_urls": "https://techcrunch.com/2025/04/24/bezos-backed-slate-auto-debuts-analog-ev-pickup-truck-that-is-decidedly-anti-tesla/",
+    "windshield_notes": "Will the next big giant car company will come from the lower market? Tesla strategy was to start from the ultra-expensive car, and along the years released cheaper models. Slate Auto tries the other way around.",
+    "windshield_prompt": "Summarize the articles in 2\u20133 concise paragraphs focusing on their relevance to the autonomous vehicle. Please be succinct and avoid unnecessary details. Write in first-person singular.",
+    "num_rearview": 3,
+    "dashboard_urls": "",
+    "dashboard_notes": "",
+    "dashboard_prompt": "Write 3 parts:\n- What's New: Describe key trends or insights concisely.\n- Why It Matters: Explain the impact on the industry succinctly.\n- What I Think: Share a brief personal opinion.",
+    "nextlane_urls": "",
+    "nextlane_notes": "",
+    "nextlane_prompt": "Summarize competitor/academic news in 2\u20133 concise paragraphs, highlighting its implications for the autonomous vehicle industry. Keep it brief and to the point.",
+    "generated_sections": {
+        "Windshield View": "Slate Auto, a new American electric vehicle startup, has burst onto the scene with a fresh approach that flips the script on the typical EV journey. Rather than starting at the high end like Tesla, Slate is diving into the fray with an affordable, customizable option that promises to be accessible to a broader audience. With a base model priced under $20,000 (after federal tax credits), Slate is taking a refreshing anti-luxury stance, offering a vehicle stripped of unnecessary frills. The truck\u2019s bare-bones design is intentional, allowing buyers to personalize their vehicles with a wide range of accessories and features, much like building a car from a \"Blank Slate.\"\n\nThis strategy of affordability and deep customization isn't just a quirky marketing gimmick; it\u2019s a bold business model. By sidestepping the high cost of luxury features and focusing on optional add-ons, Slate aims to make EV ownership more attainable while creating a robust aftermarket revenue stream. The company\u2019s approach is supported by hefty financial backing, including investments from Jeff Bezos and Mark Walter, which positions it well to navigate the tumultuous waters of the automotive industry.\n\nSlate's introduction comes at a time when other EV startups have struggled to find their footing, with many facing financial difficulties or bankruptcy. By focusing on domestic manufacturing and a lower-cost entry point, Slate hopes to carve out a niche in a challenging market. Its innovative business model could very well redefine what it means to be an EV company, offering a glimpse into a future where personalization and affordability drive consumer choice. As the industry\u2019s eyes turn to Slate, one can\u2019t help but wonder if this could be the beginning of a new era in electric vehicles."
+    },
+    "edited_sections": {},
+    "selected_provider": "OpenAI",
+    "selected_model": "gpt-4o",
+    "language": "English",
+    "theme": "Light",
+    "rearview_urls_1": "",
+    "rearview_notes_1": "",
+    "rearview_prompt_1": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_2": "",
+    "rearview_notes_2": "",
+    "rearview_prompt_2": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_3": "",
+    "rearview_notes_3": "",
+    "rearview_prompt_3": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total."
+}
