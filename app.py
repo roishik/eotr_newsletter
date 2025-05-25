@@ -10,6 +10,9 @@ from typing import Dict, Any, Optional
 # Import configuration first
 from config.settings import APP_TITLE, APP_ICON, DEFAULT_THEME, DEFAULT_LANGUAGE
 
+from dotenv import load_dotenv
+load_dotenv()  # This will load the environment variables from .env
+
 # Set page configuration
 st.set_page_config(
     page_title=APP_TITLE, 
