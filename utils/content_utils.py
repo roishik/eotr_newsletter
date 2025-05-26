@@ -20,7 +20,7 @@ def extract_article_text(urls: str) -> str:
         urls: String containing URLs separated by ";;"
         
     Returns:
-        Combined text from all articles
+        Combined text from all articles or error message if extraction fails
     """
     print(f"\n[Article Extraction] Starting extraction for URLs: {urls}")
     combined_text = ""
@@ -28,28 +28,67 @@ def extract_article_text(urls: str) -> str:
     
     print(f"[Article Extraction] Found {len(url_list)} URLs to process")
     
+    if not url_list:
+        return ""
+    
+    # Add headers to mimic a real browser
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+    }
+    
+    failed_urls = []
     for url in url_list:
         try:
             print(f"[Article Extraction] Fetching content from: {url}")
-            response = requests.get(url)
+            response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
             print(f"[Article Extraction] Response status code: {response.status_code}")
             
             soup = BeautifulSoup(response.text, "html.parser")
-            paragraphs = soup.find_all("p")
-            print(f"[Article Extraction] Found {len(paragraphs)} paragraphs")
             
-            article = "\n".join(p.get_text() for p in paragraphs)
+            # Try multiple methods to extract content
+            article = ""
+            
+            # Method 1: Look for article content in common containers
+            article_containers = soup.find_all(['article', 'main', 'div'], class_=lambda x: x and any(term in str(x).lower() for term in ['article', 'content', 'post', 'entry']))
+            if article_containers:
+                paragraphs = article_containers[0].find_all(['p', 'div', 'section'])
+                article = "\n".join(p.get_text().strip() for p in paragraphs if p.get_text().strip())
+            
+            # Method 2: If no content found, try all paragraphs
+            if not article:
+                paragraphs = soup.find_all('p')
+                article = "\n".join(p.get_text().strip() for p in paragraphs if p.get_text().strip())
+            
+            # Method 3: If still no content, try looking for text in any div
+            if not article:
+                divs = soup.find_all('div')
+                article = "\n".join(d.get_text().strip() for d in divs if len(d.get_text().strip()) > 100)
+            
             print(f"[Article Extraction] Extracted text length: {len(article)} characters")
             
+            if len(article.strip()) == 0:
+                failed_urls.append(url)
+                continue
+                
             combined_text += article + "\n\n"
         except Exception as e:
             error_msg = f"Error fetching URL {url}: {str(e)}"
             print(f"[Article Extraction] {error_msg}")
-            combined_text += error_msg + "\n\n"
+            failed_urls.append(url)
     
     final_text = combined_text.strip()
     print(f"[Article Extraction] Final combined text length: {len(final_text)} characters")
+    
+    # If all URLs failed or no content was extracted, return error message
+    if len(failed_urls) == len(url_list):
+        return f"⚠️ Could not extract content from any of the provided URLs: {', '.join(failed_urls)}"
+    elif failed_urls:
+        return f"{final_text}\n\n⚠️ Could not extract content from: {', '.join(failed_urls)}"
+    
     return final_text
 
 def generate_section_content(
