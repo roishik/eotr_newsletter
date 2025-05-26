@@ -301,9 +301,20 @@ def add_theme_selector():
             from ui.styles import apply_base_styles
             apply_base_styles()
 
+def display_prompt_expander(section_key: str):
+    """Display the full prompt used for content generation."""
+    if "section_prompts" in st.session_state and section_key in st.session_state.section_prompts:
+        prompt_data = st.session_state.section_prompts[section_key]
+        with st.expander("🔍 View Full Prompt", expanded=False):
+            st.markdown("### System Prompt")
+            st.text_area("", value=prompt_data["system_prompt"], height=150, disabled=True)
+            st.markdown("### User Prompt")
+            st.text_area("", value=prompt_data["user_prompt"], height=300, disabled=True)
+            st.markdown(f"**Provider:** {prompt_data['provider']}  \n**Model:** {prompt_data['model']}")
+
 def add_section_controls(section_name: str, section_data: Dict):
     """Add controls for managing a section."""
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     
     with col1:
         if st.button("🔄 Generate", key=f"generate_{section_name}"):
@@ -320,12 +331,24 @@ def add_section_controls(section_name: str, section_data: Dict):
             st.session_state.delete_section = True
             st.session_state.current_section = section_name
     
+    with col4:
+        if st.button("🔍 Prompt", key=f"prompt_{section_name}"):
+            st.session_state.show_prompt = True
+            st.session_state.current_section = section_name
+    
     # Add drag handle for reordering
     st.markdown(f"""
         <div class="drag-handle" data-section="{section_name}">
             <i class="fas fa-grip-vertical"></i>
         </div>
     """, unsafe_allow_html=True)
+    
+    # Display prompt if requested
+    if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == section_name:
+        display_prompt_expander(section_name)
+        if st.button("Close Prompt", key=f"close_prompt_{section_name}"):
+            st.session_state.show_prompt = False
+            st.rerun()
 
 def add_drag_drop_support():
     """Add drag-and-drop support for reordering sections."""

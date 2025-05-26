@@ -4,7 +4,8 @@ from ui.components import (
     section_input_form, 
     show_completion_status, 
     loading_animation,
-    display_language_indicator
+    display_language_indicator,
+    display_prompt_expander
 )
 from utils.content_utils import (
     extract_article_text, 
@@ -36,6 +37,7 @@ def render_generate_view(llm_service: LLMService):
             )
 
         # Windshield View Section
+        st.subheader("Windshield View")
         windshield_urls, windshield_notes, windshield_prompt = section_input_form(
             "Windshield View",
             "windshield_urls",
@@ -44,26 +46,52 @@ def render_generate_view(llm_service: LLMService):
             DEFAULT_PROMPTS["windshield"]
         )
         
-        if st.button("Generate Windshield Section"):
-            with st.spinner("Generating Windshield section..."):
-                article_text = extract_article_text(windshield_urls)
-                generated_text = generate_section_content(
-                    llm_service=llm_service,
-                    section_key="windshield",
-                    article_text=article_text,
-                    notes=windshield_notes,
-                    section_prompt=windshield_prompt,
-                    provider=st.session_state.get("selected_provider", "OpenAI"),
-                    model=st.session_state.get("selected_model", "gpt-4o"),
-                    language=st.session_state.get("language", "English")
-                )
-                
-                # Initialize generated_sections if not exists
-                if "generated_sections" not in st.session_state:
-                    st.session_state.generated_sections = {}
-                
-                st.session_state.generated_sections["Windshield View"] = generated_text
-                st.success("Windshield section generated!")
+        # Add section controls
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        with col1:
+            if st.button("🔄 Generate", key="generate_windshield"):
+                with st.spinner("Generating Windshield section..."):
+                    article_text = extract_article_text(windshield_urls)
+                    generated_text = generate_section_content(
+                        llm_service=llm_service,
+                        section_key="windshield",
+                        article_text=article_text,
+                        notes=windshield_notes,
+                        section_prompt=windshield_prompt,
+                        provider=st.session_state.get("selected_provider", "OpenAI"),
+                        model=st.session_state.get("selected_model", "gpt-4o"),
+                        language=st.session_state.get("language", "English")
+                    )
+                    
+                    # Initialize generated_sections if not exists
+                    if "generated_sections" not in st.session_state:
+                        st.session_state.generated_sections = {}
+                    
+                    st.session_state.generated_sections["Windshield View"] = generated_text
+                    st.success("Windshield section generated!")
+        
+        with col2:
+            if st.button("✏️ Edit", key="edit_windshield"):
+                st.session_state.edit_section = True
+                st.session_state.current_section = "Windshield View"
+        
+        with col3:
+            if st.button("🗑️ Delete", key="delete_windshield"):
+                if "generated_sections" in st.session_state:
+                    st.session_state.generated_sections.pop("Windshield View", None)
+                st.success("Windshield section deleted!")
+        
+        with col4:
+            if st.button("🔍 Prompt", key="prompt_windshield"):
+                st.session_state.show_prompt = True
+                st.session_state.current_section = "Windshield View"
+        
+        # Display prompt if requested
+        if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == "Windshield View":
+            display_prompt_expander("windshield")
+            if st.button("Close Prompt", key="close_prompt_windshield"):
+                st.session_state.show_prompt = False
+                st.rerun()
 
         # Rearview Mirror Section (multiple stories)
         st.subheader("Rearview Mirror (Multiple Stories)")
@@ -86,35 +114,54 @@ def render_generate_view(llm_service: LLMService):
                 DEFAULT_PROMPTS["rearview"]
             )
             
-            if st.button(f"Generate Rearview {i} Section"):
-                with st.spinner(f"Generating Rearview {i} section..."):
-                    print(f"\n[Generate View] Generating Rearview Mirror {i}")
-                    print(f"[Generate View] Session state keys: {st.session_state.keys()}")
-                    print(f"[Generate View] rearview_urls_{i}: {st.session_state.get(f'rearview_urls_{i}', '')}")
-                    print(f"[Generate View] rearview_notes_{i}: {st.session_state.get(f'rearview_notes_{i}', '')}")
-                    print(f"[Generate View] rearview_prompt_{i}: {st.session_state.get(f'rearview_prompt_{i}', '')}")
-                    
-                    article_text = extract_article_text(st.session_state[f"rearview_urls_{i}"])
-                    generated_text = generate_section_content(
-                        llm_service=llm_service,
-                        section_key="rearview",
-                        article_text=article_text,
-                        notes=st.session_state[f"rearview_notes_{i}"],
-                        section_prompt=st.session_state[f"rearview_prompt_{i}"],
-                        provider=st.session_state.get("selected_provider", "OpenAI"),
-                        model=st.session_state.get("selected_model", "gpt-4o"),
-                        language=st.session_state.get("language", "English")
-                    )
-                    
-                    # Initialize generated_sections if not exists
-                    if "generated_sections" not in st.session_state:
-                        st.session_state.generated_sections = {}
-                    
-                    st.session_state.generated_sections[f"Rearview Mirror {i}"] = generated_text
-                    print(f"[Generate View] Generated content length: {len(generated_text)} characters")
-                    st.success(f"Rearview {i} section generated!")
+            # Add section controls for each rearview story
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+            with col1:
+                if st.button(f"🔄 Generate", key=f"generate_rearview_{i}"):
+                    with st.spinner(f"Generating Rearview {i} section..."):
+                        article_text = extract_article_text(story_urls)
+                        generated_text = generate_section_content(
+                            llm_service=llm_service,
+                            section_key=f"rearview_{i}",
+                            article_text=article_text,
+                            notes=story_notes,
+                            section_prompt=story_prompt,
+                            provider=st.session_state.get("selected_provider", "OpenAI"),
+                            model=st.session_state.get("selected_model", "gpt-4o"),
+                            language=st.session_state.get("language", "English")
+                        )
+                        
+                        if "generated_sections" not in st.session_state:
+                            st.session_state.generated_sections = {}
+                        
+                        st.session_state.generated_sections[f"Rearview Mirror {i}"] = generated_text
+                        st.success(f"Rearview {i} section generated!")
+            
+            with col2:
+                if st.button(f"✏️ Edit", key=f"edit_rearview_{i}"):
+                    st.session_state.edit_section = True
+                    st.session_state.current_section = f"Rearview Mirror {i}"
+            
+            with col3:
+                if st.button(f"🗑️ Delete", key=f"delete_rearview_{i}"):
+                    if "generated_sections" in st.session_state:
+                        st.session_state.generated_sections.pop(f"Rearview Mirror {i}", None)
+                    st.success(f"Rearview {i} section deleted!")
+            
+            with col4:
+                if st.button(f"🔍 Prompt", key=f"prompt_rearview_{i}"):
+                    st.session_state.show_prompt = True
+                    st.session_state.current_section = f"Rearview Mirror {i}"
+            
+            # Display prompt if requested
+            if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == f"Rearview Mirror {i}":
+                display_prompt_expander(f"rearview_{i}")
+                if st.button("Close Prompt", key=f"close_prompt_rearview_{i}"):
+                    st.session_state.show_prompt = False
+                    st.rerun()
 
         # Dashboard Data Section
+        st.subheader("Dashboard Data")
         dashboard_urls, dashboard_notes, dashboard_prompt = section_input_form(
             "Dashboard Data",
             "dashboard_urls",
@@ -123,28 +170,54 @@ def render_generate_view(llm_service: LLMService):
             DEFAULT_PROMPTS["dashboard"]
         )
         
-        if st.button("Generate Dashboard Section"):
-            with st.spinner("Generating Dashboard section..."):
-                article_text = extract_article_text(dashboard_urls)
-                generated_text = generate_section_content(
-                    llm_service=llm_service,
-                    section_key="dashboard",
-                    article_text=article_text,
-                    notes=dashboard_notes,
-                    section_prompt=dashboard_prompt,
-                    provider=st.session_state.get("selected_provider", "OpenAI"),
-                    model=st.session_state.get("selected_model", "gpt-4o"),
-                    language=st.session_state.get("language", "English")
-                )
-                
-                # Initialize generated_sections if not exists
-                if "generated_sections" not in st.session_state:
-                    st.session_state.generated_sections = {}
-                
-                st.session_state.generated_sections["Dashboard Data"] = generated_text
-                st.success("Dashboard section generated!")
+        # Add section controls
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        with col1:
+            if st.button("🔄 Generate", key="generate_dashboard"):
+                with st.spinner("Generating Dashboard section..."):
+                    article_text = extract_article_text(dashboard_urls)
+                    generated_text = generate_section_content(
+                        llm_service=llm_service,
+                        section_key="dashboard",
+                        article_text=article_text,
+                        notes=dashboard_notes,
+                        section_prompt=dashboard_prompt,
+                        provider=st.session_state.get("selected_provider", "OpenAI"),
+                        model=st.session_state.get("selected_model", "gpt-4o"),
+                        language=st.session_state.get("language", "English")
+                    )
+                    
+                    if "generated_sections" not in st.session_state:
+                        st.session_state.generated_sections = {}
+                    
+                    st.session_state.generated_sections["Dashboard Data"] = generated_text
+                    st.success("Dashboard section generated!")
+        
+        with col2:
+            if st.button("✏️ Edit", key="edit_dashboard"):
+                st.session_state.edit_section = True
+                st.session_state.current_section = "Dashboard Data"
+        
+        with col3:
+            if st.button("🗑️ Delete", key="delete_dashboard"):
+                if "generated_sections" in st.session_state:
+                    st.session_state.generated_sections.pop("Dashboard Data", None)
+                st.success("Dashboard section deleted!")
+        
+        with col4:
+            if st.button("🔍 Prompt", key="prompt_dashboard"):
+                st.session_state.show_prompt = True
+                st.session_state.current_section = "Dashboard Data"
+        
+        # Display prompt if requested
+        if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == "Dashboard Data":
+            display_prompt_expander("dashboard")
+            if st.button("Close Prompt", key="close_prompt_dashboard"):
+                st.session_state.show_prompt = False
+                st.rerun()
 
         # The Next Lane Section
+        st.subheader("The Next Lane")
         nextlane_urls, nextlane_notes, nextlane_prompt = section_input_form(
             "The Next Lane",
             "nextlane_urls",
@@ -153,65 +226,51 @@ def render_generate_view(llm_service: LLMService):
             DEFAULT_PROMPTS["nextlane"]
         )
         
-        if st.button("Generate Next Lane Section"):
-            with st.spinner("Generating The Next Lane section..."):
-                article_text = extract_article_text(nextlane_urls)
-                generated_text = generate_section_content(
-                    llm_service=llm_service,
-                    section_key="nextlane",
-                    article_text=article_text,
-                    notes=nextlane_notes,
-                    section_prompt=nextlane_prompt,
-                    provider=st.session_state.get("selected_provider", "OpenAI"),
-                    model=st.session_state.get("selected_model", "gpt-4o"),
-                    language=st.session_state.get("language", "English")
-                )
-                
-                # Initialize generated_sections if not exists
-                if "generated_sections" not in st.session_state:
-                    st.session_state.generated_sections = {}
-                
-                st.session_state.generated_sections["The Next Lane"] = generated_text
-                st.success("The Next Lane section generated!")
-
-        # Create complete newsletter
-        st.markdown("---")
-        if st.button("Create Newsletter"):
-            with st.spinner("Assembling Newsletter..."):
-                sections_content = ""
-                # Fixed order: Windshield, Rearview stories, Dashboard, Next Lane
-                sections = []
-                sections.append(("Windshield View", st.session_state.generated_sections.get("Windshield View", "Not generated yet.")))
-                for i in range(1, int(st.session_state.get("num_rearview", 3)) + 1):
-                    sections.append((f"Rearview Mirror {i}", st.session_state.generated_sections.get(f"Rearview Mirror {i}", "Not generated yet.")))
-                sections.append(("Dashboard Data", st.session_state.generated_sections.get("Dashboard Data", "Not generated yet.")))
-                sections.append(("The Next Lane", st.session_state.generated_sections.get("The Next Lane", "Not generated yet.")))
-                
-                for title, content in sections:
-                    # Determine text direction based on language
-                    dir_attr = 'rtl' if st.session_state.get('language', 'English') == "Hebrew" else 'ltr'
-                    sections_content += f"""
-                    <div class="section" dir="{dir_attr}">
-                        <h2>{title}</h2>
-                        <p>{content}</p>
-                    </div>
-                    """
-                
-                newsletter_html = generate_newsletter_html(
-                    sections_content, 
-                    theme=st.session_state.get('theme', 'Light'),
-                    language=st.session_state.get('language', 'English')
-                )
-                
-                st.success("Newsletter Created!")
-                render_newsletter_preview(newsletter_html)
-                
-                st.download_button(
-                    "Download Newsletter",
-                    data=newsletter_html,
-                    file_name=f"newsletter_{st.session_state.get('timestamp', '')}",
-                    mime="text/html"
-                )
+        # Add section controls
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        with col1:
+            if st.button("🔄 Generate", key="generate_nextlane"):
+                with st.spinner("Generating The Next Lane section..."):
+                    article_text = extract_article_text(nextlane_urls)
+                    generated_text = generate_section_content(
+                        llm_service=llm_service,
+                        section_key="nextlane",
+                        article_text=article_text,
+                        notes=nextlane_notes,
+                        section_prompt=nextlane_prompt,
+                        provider=st.session_state.get("selected_provider", "OpenAI"),
+                        model=st.session_state.get("selected_model", "gpt-4o"),
+                        language=st.session_state.get("language", "English")
+                    )
+                    
+                    if "generated_sections" not in st.session_state:
+                        st.session_state.generated_sections = {}
+                    
+                    st.session_state.generated_sections["The Next Lane"] = generated_text
+                    st.success("The Next Lane section generated!")
+        
+        with col2:
+            if st.button("✏️ Edit", key="edit_nextlane"):
+                st.session_state.edit_section = True
+                st.session_state.current_section = "The Next Lane"
+        
+        with col3:
+            if st.button("🗑️ Delete", key="delete_nextlane"):
+                if "generated_sections" in st.session_state:
+                    st.session_state.generated_sections.pop("The Next Lane", None)
+                st.success("The Next Lane section deleted!")
+        
+        with col4:
+            if st.button("🔍 Prompt", key="prompt_nextlane"):
+                st.session_state.show_prompt = True
+                st.session_state.current_section = "The Next Lane"
+        
+        # Display prompt if requested
+        if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == "The Next Lane":
+            display_prompt_expander("nextlane")
+            if st.button("Close Prompt", key="close_prompt_nextlane"):
+                st.session_state.show_prompt = False
+                st.rerun()
 
     with right_panel:
         st.header("Newsletter Summary")

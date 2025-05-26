@@ -11,6 +11,7 @@ from docx.shared import Inches
 import html2text
 import json
 import yaml
+import streamlit as st
 
 def extract_article_text(urls: str) -> str:
     """
@@ -138,6 +139,17 @@ def generate_section_content(
         system_prompt = DEFAULT_PROMPTS["overall_hebrew"]
     else:
         system_prompt = DEFAULT_PROMPTS["overall"]
+    
+    # Store the full prompt in session state
+    if "section_prompts" not in st.session_state:
+        st.session_state.section_prompts = {}
+    
+    st.session_state.section_prompts[section_key] = {
+        "system_prompt": system_prompt,
+        "user_prompt": user_content,
+        "provider": provider,
+        "model": model
+    }
     
     try:
         print("[Content Generation] Calling LLM service...")
