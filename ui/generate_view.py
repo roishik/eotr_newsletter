@@ -46,10 +46,10 @@ def render_generate_view(llm_service: LLMService):
             DEFAULT_PROMPTS["windshield"]
         )
         
-        # Add section controls
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        st.markdown('<div class="section-controls-row">', unsafe_allow_html=True)
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1], gap="small")
         with col1:
-            if st.button("🔄 Generate", key="generate_windshield"):
+            if st.button("🔄 Gen", key="generate_windshield", help="Generate section"):
                 with st.spinner("Generating Windshield section..."):
                     article_text = extract_article_text(windshield_urls)
                     generated_text = generate_section_content(
@@ -62,31 +62,24 @@ def render_generate_view(llm_service: LLMService):
                         model=st.session_state.get("selected_model", "gpt-4o"),
                         language=st.session_state.get("language", "English")
                     )
-                    
-                    # Initialize generated_sections if not exists
                     if "generated_sections" not in st.session_state:
                         st.session_state.generated_sections = {}
-                    
                     st.session_state.generated_sections["Windshield View"] = generated_text
                     st.success("Windshield section generated!")
-        
         with col2:
-            if st.button("✏️ Edit", key="edit_windshield"):
+            if st.button("✏️ Edit", key="edit_windshield", help="Edit section"):
                 st.session_state.edit_section = True
                 st.session_state.current_section = "Windshield View"
-        
         with col3:
-            if st.button("🗑️ Delete", key="delete_windshield"):
+            if st.button("🗑️ Del", key="delete_windshield", help="Delete section"):
                 if "generated_sections" in st.session_state:
                     st.session_state.generated_sections.pop("Windshield View", None)
                 st.success("Windshield section deleted!")
-        
         with col4:
-            if st.button("🔍 Prompt", key="prompt_windshield"):
+            if st.button("🔍 Prm", key="prompt_windshield", help="Show prompt"):
                 st.session_state.show_prompt = True
                 st.session_state.current_section = "Windshield View"
-        
-        # Display prompt if requested
+        st.markdown('</div>', unsafe_allow_html=True)
         if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == "Windshield View":
             display_prompt_expander("windshield")
             if st.button("Close Prompt", key="close_prompt_windshield"):
@@ -114,10 +107,10 @@ def render_generate_view(llm_service: LLMService):
                 DEFAULT_PROMPTS["rearview"]
             )
             
-            # Add section controls for each rearview story
-            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+            st.markdown('<div class="section-controls-row">', unsafe_allow_html=True)
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1], gap="small")
             with col1:
-                if st.button(f"🔄 Generate", key=f"generate_rearview_{i}"):
+                if st.button(f"🔄 Gen", key=f"generate_rearview_{i}", help="Generate section"):
                     with st.spinner(f"Generating Rearview {i} section..."):
                         article_text = extract_article_text(story_urls)
                         generated_text = generate_section_content(
@@ -138,22 +131,22 @@ def render_generate_view(llm_service: LLMService):
                         st.success(f"Rearview {i} section generated!")
             
             with col2:
-                if st.button(f"✏️ Edit", key=f"edit_rearview_{i}"):
+                if st.button(f"✏️ Edit", key=f"edit_rearview_{i}", help="Edit section"):
                     st.session_state.edit_section = True
                     st.session_state.current_section = f"Rearview Mirror {i}"
             
             with col3:
-                if st.button(f"🗑️ Delete", key=f"delete_rearview_{i}"):
+                if st.button(f"🗑️ Del", key=f"delete_rearview_{i}", help="Delete section"):
                     if "generated_sections" in st.session_state:
                         st.session_state.generated_sections.pop(f"Rearview Mirror {i}", None)
                     st.success(f"Rearview {i} section deleted!")
             
             with col4:
-                if st.button(f"🔍 Prompt", key=f"prompt_rearview_{i}"):
+                if st.button(f"🔍 Prm", key=f"prompt_rearview_{i}", help="Show prompt"):
                     st.session_state.show_prompt = True
                     st.session_state.current_section = f"Rearview Mirror {i}"
             
-            # Display prompt if requested
+            st.markdown('</div>', unsafe_allow_html=True)
             if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == f"Rearview Mirror {i}":
                 display_prompt_expander(f"rearview_{i}")
                 if st.button("Close Prompt", key=f"close_prompt_rearview_{i}"):
@@ -170,10 +163,10 @@ def render_generate_view(llm_service: LLMService):
             DEFAULT_PROMPTS["dashboard"]
         )
         
-        # Add section controls
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        st.markdown('<div class="section-controls-row">', unsafe_allow_html=True)
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1], gap="small")
         with col1:
-            if st.button("🔄 Generate", key="generate_dashboard"):
+            if st.button("🔄 Gen", key="generate_dashboard", help="Generate section"):
                 with st.spinner("Generating Dashboard section..."):
                     article_text = extract_article_text(dashboard_urls)
                     generated_text = generate_section_content(
@@ -194,22 +187,22 @@ def render_generate_view(llm_service: LLMService):
                     st.success("Dashboard section generated!")
         
         with col2:
-            if st.button("✏️ Edit", key="edit_dashboard"):
+            if st.button("✏️ Edit", key="edit_dashboard", help="Edit section"):
                 st.session_state.edit_section = True
                 st.session_state.current_section = "Dashboard Data"
         
         with col3:
-            if st.button("🗑️ Delete", key="delete_dashboard"):
+            if st.button("🗑️ Del", key="delete_dashboard", help="Delete section"):
                 if "generated_sections" in st.session_state:
                     st.session_state.generated_sections.pop("Dashboard Data", None)
                 st.success("Dashboard section deleted!")
         
         with col4:
-            if st.button("🔍 Prompt", key="prompt_dashboard"):
+            if st.button("🔍 Prm", key="prompt_dashboard", help="Show prompt"):
                 st.session_state.show_prompt = True
                 st.session_state.current_section = "Dashboard Data"
         
-        # Display prompt if requested
+        st.markdown('</div>', unsafe_allow_html=True)
         if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == "Dashboard Data":
             display_prompt_expander("dashboard")
             if st.button("Close Prompt", key="close_prompt_dashboard"):
@@ -226,10 +219,10 @@ def render_generate_view(llm_service: LLMService):
             DEFAULT_PROMPTS["nextlane"]
         )
         
-        # Add section controls
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        st.markdown('<div class="section-controls-row">', unsafe_allow_html=True)
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1], gap="small")
         with col1:
-            if st.button("🔄 Generate", key="generate_nextlane"):
+            if st.button("🔄 Gen", key="generate_nextlane", help="Generate section"):
                 with st.spinner("Generating The Next Lane section..."):
                     article_text = extract_article_text(nextlane_urls)
                     generated_text = generate_section_content(
@@ -250,22 +243,22 @@ def render_generate_view(llm_service: LLMService):
                     st.success("The Next Lane section generated!")
         
         with col2:
-            if st.button("✏️ Edit", key="edit_nextlane"):
+            if st.button("✏️ Edit", key="edit_nextlane", help="Edit section"):
                 st.session_state.edit_section = True
                 st.session_state.current_section = "The Next Lane"
         
         with col3:
-            if st.button("🗑️ Delete", key="delete_nextlane"):
+            if st.button("🗑️ Del", key="delete_nextlane", help="Delete section"):
                 if "generated_sections" in st.session_state:
                     st.session_state.generated_sections.pop("The Next Lane", None)
                 st.success("The Next Lane section deleted!")
         
         with col4:
-            if st.button("🔍 Prompt", key="prompt_nextlane"):
+            if st.button("🔍 Prm", key="prompt_nextlane", help="Show prompt"):
                 st.session_state.show_prompt = True
                 st.session_state.current_section = "The Next Lane"
         
-        # Display prompt if requested
+        st.markdown('</div>', unsafe_allow_html=True)
         if st.session_state.get("show_prompt", False) and st.session_state.get("current_section") == "The Next Lane":
             display_prompt_expander("nextlane")
             if st.button("Close Prompt", key="close_prompt_nextlane"):

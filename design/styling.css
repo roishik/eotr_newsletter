@@ -86,3 +86,31 @@ h1 {
     border-left: 4px solid #dc3545;
     margin: 10px 0;
 }
+
+/* Compact pill-style buttons for section controls */
+.section-controls-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.section-controls-row .stButton > button {
+    padding: 0.2rem 0.7rem !important;
+    font-size: 0.9rem !important;
+    border-radius: 20px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 2rem !important;
+    line-height: 1.2 !important;
+    background: #5F9EA0;
+    color: #fff;
+    border: none;
+    margin: 0;
+    box-shadow: none;
+    transition: background 0.2s;
+}
+
+.section-controls-row .stButton > button:hover {
+    background: #2e6c80;
+}
