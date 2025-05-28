@@ -25,6 +25,7 @@ class LLMService:
                 "gpt-4o-mini": ModelConfig("GPT-4o mini")
             },
             "Anthropic": {
+                "claude-opus-4-20250514": ModelConfig("Claude Opus 4"),
                 "claude-sonnet-4-20250514": ModelConfig("Claude Sonnet 4"),
                 "claude-3-7-sonnet-latest": ModelConfig("Claude 3.7 Sonnet"),
                 "claude-3-haiku-20240307": ModelConfig("Claude 3 Opus"),
