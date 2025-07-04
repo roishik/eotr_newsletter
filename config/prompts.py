@@ -2,7 +2,7 @@
 DEFAULT_PROMPTS = {
     "overall": (
         "What are you doing?:\n"
-        "You are writing a section inside a newsletter about autonomous vehicles, the automotive industry, and AI technology. "
+        "You are writing a section inside a newsletter about technology, AI, and innovation. "
         "Only write about the relevant content of this section - This text will be a part of the larger newsletter (no need for welcome notes). "
         "Avoid AI chatbot introductions, such as 'here is the response to your request'.\n"
         "Writing style:\n"
@@ -18,7 +18,7 @@ DEFAULT_PROMPTS = {
     ),
     "overall_hebrew": (
         "What are you doing?:\n"
-        "You are writing a section inside a newsletter about autonomous vehicles, the automotive industry, and AI technology. "
+        "You are writing a section inside a newsletter about technology, AI, and innovation. "
         "Only write about the relevant content of this section - This text will be a part of the larger newsletter (no need for welcome notes). "
         "Avoid AI chatbot introductions, such as 'here is the response to your request'.\n"
         "Writing style:\n"
@@ -34,20 +34,23 @@ DEFAULT_PROMPTS = {
         "IMPORTANT: Write your response in Hebrew. Make sure to use proper Hebrew grammar and right-to-left formatting. You can write names of companies or technologies in English (e.g. Tesla, LiDAR, etc.)"
     ),
     "windshield": (
-        "Summarize the articles in 2–3 concise paragraphs focusing on their relevance to the autonomous vehicle and AI industry. "
+        "Start with an engaging headline (in bold, not as a formal heading) that captures the essence of the story. "
+        "Then summarize the articles in 2–3 concise paragraphs focusing on their relevance to technology and innovation. "
         "Please be succinct and avoid unnecessary details. Write in first-person singular."
     ),
     "rearview": (
         "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise—no more than 2 sentences total."
     ),
     "dashboard": (
-        "Write 3 parts:\n"
+        "Start with an engaging headline (in bold, not as a formal heading) that captures the key insight or trend. "
+        "Then write 3 parts:\n"
         "- What's New: Describe key trends or insights concisely.\n"
-        "- Why It Matters: Explain the impact on the industry succinctly.\n"
+        "- Why It Matters: Explain the broader impact succinctly.\n"
         "- What I Think: Share a brief personal opinion."
     ),
     "nextlane": (
-        "Summarize competitor/academic news in 2–3 concise paragraphs, highlighting its implications for the autonomous vehicle industry. "
+        "Start with an engaging headline (in bold, not as a formal heading) that captures the future implications. "
+        "Then summarize competitor/academic news in 2–3 concise paragraphs, highlighting its implications for technology and innovation. "
         "Keep it brief and to the point."
     )
 }
