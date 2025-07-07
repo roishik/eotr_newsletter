@@ -56,7 +56,6 @@ from utils.file_utils import (
 )
 from utils.content_utils import export_newsletter
 from utils.autosave import setup_autosave
-from utils.collaboration import setup_collaboration
 
 # Initialize services
 llm_service = LLMService()
@@ -77,9 +76,8 @@ add_theme_selector()
 add_keyboard_shortcuts()
 add_drag_drop_support()
 
-# Setup auto-save and collaboration
+# Setup auto-save
 setup_autosave()
-setup_collaboration()
 
 # Main content
 st.title("Newsletter Generator")
