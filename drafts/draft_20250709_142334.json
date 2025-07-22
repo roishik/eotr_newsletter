@@ -1,0 +1,31 @@
+{
+    "overall_prompt": "What are you doing?:\nYou are writing a section inside a newsletter about technology, AI, and innovation. Only write about the relevant content of this section - This text will be a part of the larger newsletter (no need for welcome notes). Avoid AI chatbot introductions, such as 'here is the response to your request'.\nWriting style:\nWrite in a dynamic, conversational, and friendly tone, as if speaking directly to the reader. Keep the language approachable but insightful, mixing professional analysis with a sense of curiosity and enthusiasm. Use simple, clear sentences, but don't shy away from technical terms when necessary\u2014just explain them naturally and without overcomplication. Add thoughtful commentary that connects news or updates to broader implications, offering personal insights or lessons. Maintain an optimistic and forward-thinking voice, encouraging readers to reflect and engage while keeping the overall mood warm and encouraging. Don't be too optimistic and avoid making announcements that are bigger than the actual news.\nLength:\nKeep the response concise and focused on the key points.\nWhat to write about?\nOffer a new lens on the news, providing a fresh perspective or a unique angle that doubts the status quo or offers a new way of thinking.",
+    "windshield_urls": "",
+    "windshield_notes": "",
+    "windshield_prompt": "Start with an engaging headline (in bold, not as a formal heading) that captures the essence of the story. Then summarize the articles in 2\u20133 concise paragraphs focusing on their relevance to technology and innovation. Please be succinct and avoid unnecessary details. Write in first-person singular.",
+    "num_rearview": 3,
+    "dashboard_urls": "",
+    "dashboard_notes": "",
+    "dashboard_prompt": "Start with an engaging headline (in bold, not as a formal heading) that captures the key insight or trend. Then write 3 parts:\n- What's New: Describe key trends or insights concisely.\n- Why It Matters: Explain the broader impact succinctly.\n- What I Think: Share a brief personal opinion.",
+    "nextlane_urls": "",
+    "nextlane_notes": "",
+    "nextlane_prompt": "Start with an engaging headline (in bold, not as a formal heading) that captures the future implications. Then summarize competitor/academic news in 2\u20133 concise paragraphs, highlighting its implications for technology and innovation. Keep it brief and to the point.",
+    "generated_sections": {
+        "Rearview Mirror 1": "**Intel Sells Mobileye Shares to Fund Factory Construction**  \nIntel is trimming its stake in Mobileye from 88% to under 80%, selling shares to bankroll new factory construction. This isn't just a strategic reshuffling of resources\u2014it's a savvy move for Mobileye as well. By boosting the liquidity of its stock, Mobileye stands to attract more investor interest, enhancing its market presence. It's a win-win maneuver that showcases Intel's long-term vision while creating exciting new opportunities for Mobileye.",
+        "The Next Lane": "**Meta's Bold Vision: The Future of Wearables and Beyond**\n\nMeta is turning heads with a whopping $3.5 billion investment in EssilorLuxottica, a move that signals their ambitious push into the realm of AI-powered wearables. This isn't just about stylish eyewear; it's a strategic leap towards integrating artificial intelligence (AI) with augmented reality (AR) and virtual reality (VR). Imagine a pair of glasses that can not only enhance your vision but also provide real-time information, overlay digital elements on the real world, and perhaps even change how we interact with both the digital and physical realms.\n\nMeta's significant investment indicates a broader trend towards convergence in tech\u2014where hardware and software are no longer siloed but work seamlessly together to create immersive experiences. This partnership with EssilorLuxottica, a titan in the eyewear industry, offers Meta a unique advantage to blend fashion with function, potentially setting a new standard in the wearables market. The implications are vast: from healthcare applications that provide real-time diagnostics to learning environments that make education more interactive and engaging.\n\nThis move certainly positions Meta as a frontrunner in the race to redefine how we experience the world through technology. But it also challenges competitors to rethink their strategies in the wearables and AR/VR spaces. As these technologies become more integrated into our daily lives, the potential for innovation is limitless. It's a thrilling time to watch these developments unfold, with possibilities that could reshape industries and redefine human interaction with technology."
+    },
+    "edited_sections": {},
+    "selected_provider": "OpenAI",
+    "selected_model": "gpt-4o",
+    "language": "English",
+    "theme": "Light",
+    "rearview_urls_1": "",
+    "rearview_notes_1": "",
+    "rearview_prompt_1": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_2": "",
+    "rearview_notes_2": "",
+    "rearview_prompt_2": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total.",
+    "rearview_urls_3": "",
+    "rearview_notes_3": "",
+    "rearview_prompt_3": "Provide a brief headline (bolded text, not an actual headline) and a one-sentence summary. Keep the response extremely concise\u2014no more than 2 sentences total."
+}
